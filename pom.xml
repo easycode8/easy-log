@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.github.easycode8</groupId>
+    <artifactId>easy-log</artifactId>
+    <packaging>pom</packaging>
+    <version>${revision}</version>
+    <modules>
+        <module>easy-log-core</module>
+        <module>easy-log-spring-boot-starter</module>
+    </modules>
+
+    <properties>
+        <!-- Project revision -->
+        <revision>1.0.0</revision>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <flatten-maven-plugin.version>1.2.7</flatten-maven-plugin.version>
+        <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
+
+        <spring-boot.version>2.3.2.RELEASE</spring-boot.version>
+
+        <!--alibaba json-->
+        <alibaba-json.version>1.2.79</alibaba-json.version>
+
+        <commons-io.version>2.6</commons-io.version>
+        <commons-lang3.version>3.8.1</commons-lang3.version>
+        <commons-collections.version>3.2.2</commons-collections.version>
+        <hutool-all.version>5.7.19</hutool-all.version>
+
+        <!-- swagger2 -->
+        <springfox-swagger.version>2.10.5</springfox-swagger.version>
+        <swagger-bootstrap-ui.version>1.9.6</swagger-bootstrap-ui.version>
+        <javassist.version>3.25.0-GA</javassist.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!--alibaba.json和依赖包-->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${alibaba-json.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
+            </dependency>
+
+            <!--hutool工具类-->
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool-all.version}</version>
+            </dependency>
+
+
+            <!-- 构建Restful API -->
+            <!-- swagger2 -->
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger2</artifactId>
+                <version>${springfox-swagger.version}</version>
+                <scope>compile</scope>
+            </dependency>
+
+            <!-- swagger2 UI -->
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger-ui</artifactId>
+                <version>${springfox-swagger.version}</version>
+                <scope>compile</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>swagger-bootstrap-ui</artifactId>
+                <version>${swagger-bootstrap-ui.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>${javassist.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <!-- 编译插件 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <inherited>true</inherited>
+                <configuration>
+                    <!--forceJavacCompilerUse: https://blog.csdn.net/shandeai520/article/details/107559068-->
+                    <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <parameters>true</parameters>
+                </configuration>
+            </plugin>
+
+            <!-- 版本号管理 -->
+            <!--说明: 解决${revision} install后maven本地仓库中pom.xml无法替换成实际值问题)-->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>${flatten-maven-plugin.version}</version>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            <!-- Source attach plugin (install包含源码方便调试) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven-source-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
