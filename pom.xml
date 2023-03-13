@@ -11,6 +11,7 @@
     <modules>
         <module>easy-log-core</module>
         <module>easy-log-spring-boot-starter</module>
+        <module>easy-log-sample</module>
     </modules>
 
     <properties>
@@ -77,7 +78,12 @@
                 <groupId>io.springfox</groupId>
                 <artifactId>springfox-swagger2</artifactId>
                 <version>${springfox-swagger.version}</version>
-                <scope>compile</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-spring-webmvc</artifactId>
+                <version>${springfox-swagger.version}</version>
             </dependency>
 
             <!-- swagger2 UI -->
