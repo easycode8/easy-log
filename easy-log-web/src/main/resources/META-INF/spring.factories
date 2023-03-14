@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.easycode8.easylog.web.autoconfigure.EasyLogWebAutoConfiguration
