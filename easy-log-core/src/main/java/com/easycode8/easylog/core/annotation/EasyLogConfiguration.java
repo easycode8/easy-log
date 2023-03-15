@@ -2,17 +2,19 @@ package com.easycode8.easylog.core.annotation;
 
 
 import com.easycode8.easylog.core.DefaultLogHandler;
-import com.easycode8.easylog.core.aop.interceptor.LogAttributeSource;
 import com.easycode8.easylog.core.LogDataHandler;
 import com.easycode8.easylog.core.aop.BeanFactoryLogAttributeSourceAdvisor;
-import com.easycode8.easylog.core.aop.interceptor.LogMethodInterceptor;
 import com.easycode8.easylog.core.aop.interceptor.AnnotationLogAttributeSource;
+import com.easycode8.easylog.core.aop.interceptor.LogAttributeSource;
+import com.easycode8.easylog.core.aop.interceptor.LogMethodInterceptor;
 import org.springframework.aop.Advisor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@EnableConfigurationProperties(EasyLogProperties.class)
 public class EasyLogConfiguration {
     @Bean
     public Advisor logStaticMethodMatcherPointcutAdvisor(LogAttributeSource logAttributeSource, LogMethodInterceptor logMethodInterceptor) {
@@ -40,8 +42,8 @@ public class EasyLogConfiguration {
 
     @ConditionalOnMissingBean
     @Bean
-    public LogAttributeSource logAttributeSource() {
-        return new AnnotationLogAttributeSource();
+    public LogAttributeSource logAttributeSource(EasyLogProperties easyLogProperties) {
+        return new AnnotationLogAttributeSource(easyLogProperties);
     }
 
 
