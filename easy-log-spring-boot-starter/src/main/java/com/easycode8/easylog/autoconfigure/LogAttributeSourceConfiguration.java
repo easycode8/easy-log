@@ -1,5 +1,6 @@
 package com.easycode8.easylog.autoconfigure;
 
+import com.easycode8.easylog.core.annotation.EasyLogProperties;
 import com.easycode8.easylog.core.aop.interceptor.LogAttributeSource;
 import com.easycode8.easylog.autoconfigure.source.SwaggerLogAttributeSource;
 import com.easycode8.easylog.core.aop.interceptor.AnnotationLogAttributeSource;
@@ -26,8 +27,8 @@ abstract class LogAttributeSourceConfiguration {
     @ConditionalOnMissingBean(LogAttributeSource.class)
     static class EasyLogSource {
         @Bean
-        public LogAttributeSource logAttributeSource() {
-            return new AnnotationLogAttributeSource();
+        public LogAttributeSource logAttributeSource(EasyLogProperties easyLogProperties) {
+            return new AnnotationLogAttributeSource(easyLogProperties);
         }
 
     }
