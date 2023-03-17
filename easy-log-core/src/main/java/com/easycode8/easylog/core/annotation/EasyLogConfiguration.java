@@ -7,7 +7,10 @@ import com.easycode8.easylog.core.aop.BeanFactoryLogAttributeSourceAdvisor;
 import com.easycode8.easylog.core.aop.interceptor.AnnotationLogAttributeSource;
 import com.easycode8.easylog.core.aop.interceptor.LogAttributeSource;
 import com.easycode8.easylog.core.aop.interceptor.LogMethodInterceptor;
+import com.easycode8.easylog.core.provider.OperatorProvider;
+import com.easycode8.easylog.core.provider.SessionOperatorProvider;
 import org.springframework.aop.Advisor;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -33,17 +36,23 @@ public class EasyLogConfiguration {
         return logMethodInterceptor;
     }
 
-
     @Bean
     @ConditionalOnMissingBean
-    public LogDataHandler logDataHandler() {
-        return new DefaultLogHandler() {};
-    }
-
-    @ConditionalOnMissingBean
-    @Bean
     public LogAttributeSource logAttributeSource(EasyLogProperties easyLogProperties) {
         return new AnnotationLogAttributeSource(easyLogProperties);
+    }
+
+
+    @Bean
+    @ConditionalOnMissingBean
+    public LogDataHandler logDataHandler(ObjectProvider<OperatorProvider> operatorProvider) {
+        return new DefaultLogHandler(operatorProvider.getIfAvailable());
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public OperatorProvider operatorProvider(EasyLogProperties easyLogProperties) {
+        return new SessionOperatorProvider(easyLogProperties);
     }
 
 

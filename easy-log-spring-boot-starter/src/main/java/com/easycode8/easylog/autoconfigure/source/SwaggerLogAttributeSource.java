@@ -29,6 +29,11 @@ public class SwaggerLogAttributeSource implements LogAttributeSource {
             public String template() {
                 return apiOperation.notes();
             }
+
+            @Override
+            public String operator() {
+                return null;
+            }
         };
         return logAttribute;
     }
