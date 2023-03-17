@@ -8,5 +8,7 @@ public interface LogAttribute {
     String handler();
     /** 日志spel模板*/
     String template();
+    /** 日志操作人*/
+    String operator();
 
 }

@@ -2,14 +2,12 @@ package com.easycode8.easylog.core.aop.interceptor;
 
 import com.easycode8.easylog.core.annotation.EasyLog;
 import com.easycode8.easylog.core.annotation.EasyLogProperties;
-import org.apache.logging.log4j.util.Strings;
+import com.easycode8.easylog.core.util.LogUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class AnnotationLogAttributeSource implements LogAttributeSource {
 
@@ -28,7 +26,12 @@ public class AnnotationLogAttributeSource implements LogAttributeSource {
             return new LogAttribute() {
                 @Override
                 public String title() {
-                    return easyLog.value();
+                    String title = StringUtils.isEmpty(easyLog.title()) ? easyLog.value() : easyLog.title();
+                    // 如果都没有定义标题使用默认标题
+                    if (StringUtils.isEmpty(title)) {
+                        title = LogUtils.createDefaultTitle(method, targetClass);
+                    }
+                    return title;
                 }
 
                 @Override
@@ -40,24 +43,24 @@ public class AnnotationLogAttributeSource implements LogAttributeSource {
                 public String template() {
                     return easyLog.template();
                 }
+
+                @Override
+                public String operator() {
+                    return null;
+                }
             };
         }
         // 如果找不到EasyLog 检查是否开启server-debug模式
         if (isServicePublicMethod(method, targetClass)) {
-            String title = targetClass.getSimpleName() + "." + method.getName();
-            if (method.getParameters() != null) {
-                List<String> paramNames = Arrays.stream(method.getParameters()).map(item -> item.getName()).collect(Collectors.toList());
-                Strings.join(paramNames, ',');
-                title = title + "(" + Strings.join(paramNames, ',') + ")";
-            } else {
-                title = title + "()";
-            }
+            String title = LogUtils.createDefaultTitle(method, targetClass);
 
             return buildLogAttribute( title );
         }
 
         return null;
     }
+
+
 
     private boolean isServicePublicMethod(Method method, Class<?> targetClass) {
         return easyLogProperties.getServiceDebug() && targetClass.getAnnotation(Service.class) != null
@@ -80,6 +83,11 @@ public class AnnotationLogAttributeSource implements LogAttributeSource {
             @Override
             public String template() {
                 return "";
+            }
+
+            @Override
+            public String operator() {
+                return null;
             }
         };
     }

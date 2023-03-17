@@ -1,10 +1,15 @@
 package com.easycode8.easylog.core.util;
 
 import com.alibaba.fastjson.JSON;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.CollectionUtils;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class LogUtils {
 
@@ -27,5 +32,17 @@ public class LogUtils {
             }
         }
         return params.toString();
+    }
+
+    public static String createDefaultTitle(Method method, Class<?> targetClass) {
+        String title = targetClass.getSimpleName() + "." + method.getName();
+        if (method.getParameters() != null) {
+            List<String> paramNames = Arrays.stream(method.getParameters()).map(item -> item.getName()).collect(Collectors.toList());
+            Strings.join(paramNames, ',');
+            title = title + "(" + Strings.join(paramNames, ',') + ")";
+        } else {
+            title = title + "()";
+        }
+        return title;
     }
 }

@@ -7,7 +7,11 @@ import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.lang.reflect.Method;
 
 
@@ -40,4 +44,24 @@ public class SpringSpelUtils {
         String spelDescription = expression.getValue(context, String.class);
         return spelDescription;
     }
+
+
+    /**
+     * 使用SpEL表达式从session中提取属性信息
+     *
+     * @param expression SpEL表达式
+     * @return 属性值
+     */
+    public static Object getSessionAttribute(String attributeName, String expression) {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        HttpSession session = request.getSession();
+        // 解析表达式并获取属性值
+//        return parser.parseExpression(expression).getValue(session.getAttribute("account"));
+        Object attributeValue = session.getAttribute(attributeName);
+        if (attributeValue == null) {
+            return null;
+        }
+        return parser.parseExpression(expression).getValue(attributeValue);
+    }
+
 }
