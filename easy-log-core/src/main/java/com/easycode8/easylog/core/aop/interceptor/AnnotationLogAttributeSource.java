@@ -63,7 +63,7 @@ public class AnnotationLogAttributeSource implements LogAttributeSource {
 
 
     private boolean isServicePublicMethod(Method method, Class<?> targetClass) {
-        return easyLogProperties.getServiceDebug() && targetClass.getAnnotation(Service.class) != null
+        return easyLogProperties.getScanService().getEnabled() && targetClass.getAnnotation(Service.class) != null
                 && !Modifier.isStatic(method.getModifiers())
                 && Modifier.isPublic(method.getModifiers());
     }
