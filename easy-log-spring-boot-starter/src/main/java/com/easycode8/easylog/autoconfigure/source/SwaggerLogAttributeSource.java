@@ -8,11 +8,18 @@ import io.swagger.annotations.ApiOperation;
 import java.lang.reflect.Method;
 
 public class SwaggerLogAttributeSource implements LogAttributeSource {
+
+    private LogAttributeSource logAttributeSource;
+
+    public SwaggerLogAttributeSource(LogAttributeSource logAttributeSource) {
+        this.logAttributeSource = logAttributeSource;
+    }
+
     @Override
     public LogAttribute getLogAttribute(Method method, Class<?> targetClass) {
         ApiOperation apiOperation = method.getAnnotation(ApiOperation.class);
         if (apiOperation == null) {
-            return null;
+            return logAttributeSource.getLogAttribute(method, targetClass);
         }
         LogAttribute logAttribute = new LogAttribute() {
             @Override

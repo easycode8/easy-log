@@ -14,12 +14,12 @@ abstract class LogAttributeSourceConfiguration {
 
     @ConditionalOnMissingBean(LogAttributeSource.class)
     @ConditionalOnClass(ApiOperation.class)
-    @ConditionalOnProperty(value = "spring.easy-log.swagger.enabled", havingValue = "true")
+    @ConditionalOnProperty(value = "spring.easy-log.scan-swagger.enabled", havingValue = "true")
     static class SwaggerSource {
 
         @Bean
-        public LogAttributeSource logAttributeSource() {
-            return new SwaggerLogAttributeSource();
+        public LogAttributeSource logAttributeSource(EasyLogProperties easyLogProperties) {
+            return new SwaggerLogAttributeSource(new AnnotationLogAttributeSource(easyLogProperties));
         }
 
     }
