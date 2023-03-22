@@ -3,6 +3,7 @@ package com.easycode8.easylog.core.aop.interceptor;
 
 import com.easycode8.easylog.core.LogDataHandler;
 import com.easycode8.easylog.core.LogInfo;
+import com.easycode8.easylog.core.util.LogUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
@@ -45,16 +46,16 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
         long startTime = System.currentTimeMillis();
         LogInfo info = handle.init(logAttribute, method, args, targetClass);
         logInfoHolder.set(info);
-
+        info.setStatus(LogInfo.STATUS_INIT);
         Object retVal;
-        boolean runOk = false;
         try {
             // This is an around advice: Invoke the next interceptor in the chain.
             // This will normally result in a target object being invoked.
             handle.before(info, method, targetClass);
+            info.setStatus(LogInfo.STATUS_BEFORE);
             retVal = invocation.proceedWithLog();
             info.setTimeout(System.currentTimeMillis() - startTime);
-            runOk = true;
+            info.setStatus(LogInfo.STATUS_FINISH);
             if (isAsync) {
                 threadPoolTaskExecutor.execute(() -> handle.after(info, method, targetClass));
             } else {
@@ -63,19 +64,20 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
 
 
         } catch (Throwable ex) {
-            info.setException(ex.getMessage());
+
             info.setTimeout(System.currentTimeMillis() - startTime);
-            // 业务执行不成功记录失败原因
-            if (!runOk) {
+            if (LogInfo.STATUS_INIT == info.getStatus()) {
+                LOGGER.error("[easy-log] handle before {} error:{}", LogUtils.createDefaultTitle(method, targetClass), ex.getMessage(), ex);
+            } else if (LogInfo.STATUS_BEFORE == info.getStatus()) { // 业务执行不成功记录失败原因
+                info.setException(ex.getMessage());
                 if (isAsync) {
                     threadPoolTaskExecutor.execute(() -> handle.after(info, method, targetClass));
                 } else {
                     handle.after(info, method, targetClass);
                 }
 
-            } else {
-                // 业务执行成功,但是日志后处理失败,提示错误日志。这时候业务会因为异常回滚操作
-                LOGGER.error("log handle after run error:{}", ex.getMessage(), ex);
+            } else if (LogInfo.STATUS_FINISH == info.getStatus()) { // 业务执行成功,但是日志后处理失败,提示错误日志。这时候业务会因为异常回滚操作
+                LOGGER.error("[easy-log] handle after {} error:{}", LogUtils.createDefaultTitle(method, targetClass), ex.getMessage(), ex);
             }
 
             throw ex;

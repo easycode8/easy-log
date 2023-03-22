@@ -21,7 +21,10 @@ public class DefaultLogHandler extends AbstractLogDataHandler {
 
     @Override
     public void after(LogInfo info, Method method, Class<?> targetClass) {
-        LOGGER.info("[easy-log][{}]--end timeout:{} exception:{}", info.getTitle(), info.getTimeout(), info.getException());
-
+        if (LogInfo.STATUS_FINISH == info.getStatus()) {
+            LOGGER.info("[easy-log][{}]--end timeout:{}", info.getTitle(), info.getTimeout());
+        } else {
+            LOGGER.warn("[easy-log][{}]--end timeout:{} exception:{}", info.getTitle(), info.getTimeout(), info.getException());
+        }
     }
 }
