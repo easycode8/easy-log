@@ -10,5 +10,7 @@ public interface LogAttribute {
     String template();
     /** 日志操作人*/
     String operator();
+    /** 是否异步处理日志*/
+    boolean async();
 
 }

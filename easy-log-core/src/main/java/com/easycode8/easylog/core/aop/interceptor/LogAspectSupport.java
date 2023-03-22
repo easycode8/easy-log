@@ -3,12 +3,15 @@ package com.easycode8.easylog.core.aop.interceptor;
 
 import com.easycode8.easylog.core.LogDataHandler;
 import com.easycode8.easylog.core.LogInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.BeanFactoryAnnotationUtils;
 import org.springframework.core.NamedThreadLocal;
 import org.springframework.lang.Nullable;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
@@ -18,6 +21,7 @@ import java.lang.reflect.Method;
  * InitializingBean 校验必须需要的资源
  */
 public abstract class LogAspectSupport implements BeanFactoryAware , InitializingBean {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LogAspectSupport.class);
 
     private static final ThreadLocal<LogInfo> logInfoHolder = new NamedThreadLocal<>("current thread log info");
 
@@ -25,6 +29,7 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
 
     private LogDataHandler logDataHandler;
 
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     @Nullable
     private BeanFactory beanFactory;
@@ -34,6 +39,7 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
         // 获取日志属性（是否强事务,日志保存成功才算业务成功）
         LogAttribute logAttribute = getLogAttributeSource().getLogAttribute(method, targetClass);
         final LogDataHandler handle = this.determineLogHandleAdapter(logAttribute);
+        boolean isAsync = logAttribute.async();
 
         // 创建日志信息
         long startTime = System.currentTimeMillis();
@@ -41,34 +47,45 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
         logInfoHolder.set(info);
 
         Object retVal;
+        boolean runOk = false;
         try {
             // This is an around advice: Invoke the next interceptor in the chain.
             // This will normally result in a target object being invoked.
             handle.before(info, method, targetClass);
             retVal = invocation.proceedWithLog();
-
-        }
-        catch (Throwable ex) {
-            // target invocation exception
-            //completeTransactionAfterThrowing(txInfo, ex);
-            info.setException(ex.getMessage());
-            throw ex;
-        }
-        finally {
             info.setTimeout(System.currentTimeMillis() - startTime);
-            //cleanupTransactionInfo(txInfo);
+            runOk = true;
+            if (isAsync) {
+                threadPoolTaskExecutor.execute(() -> handle.after(info, method, targetClass));
+            } else {
+                handle.after(info, method, targetClass);
+            }
+
+
+        } catch (Throwable ex) {
+            info.setException(ex.getMessage());
+            info.setTimeout(System.currentTimeMillis() - startTime);
+            // 业务执行不成功记录失败原因
+            if (!runOk) {
+                if (isAsync) {
+                    threadPoolTaskExecutor.execute(() -> handle.after(info, method, targetClass));
+                } else {
+                    handle.after(info, method, targetClass);
+                }
+
+            } else {
+                // 业务执行成功,但是日志后处理失败,提示错误日志。这时候业务会因为异常回滚操作
+                LOGGER.error("log handle after run error:{}", ex.getMessage(), ex);
+            }
+
+            throw ex;
+        } finally {
             logInfoHolder.remove();
-
-        }
-
-        try {
-            handle.after(info, method, targetClass);
-        } catch (Exception e) {
-            // 日志处理失败忽略处理
         }
 
         return retVal;
     }
+
 
     /**
      * 支持注解中指定 自定义日志处理器
@@ -144,5 +161,13 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
 
     public void setLogHandleAdapter(LogDataHandler logDataHandler) {
         this.logDataHandler = logDataHandler;
+    }
+
+    public ThreadPoolTaskExecutor getThreadPoolTaskExecutor() {
+        return threadPoolTaskExecutor;
+    }
+
+    public void setThreadPoolTaskExecutor(ThreadPoolTaskExecutor threadPoolTaskExecutor) {
+        this.threadPoolTaskExecutor = threadPoolTaskExecutor;
     }
 }
