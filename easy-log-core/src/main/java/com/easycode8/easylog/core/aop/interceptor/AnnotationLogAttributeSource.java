@@ -23,38 +23,35 @@ public class AnnotationLogAttributeSource implements LogAttributeSource {
         EasyLog easyLog = method.getAnnotation(EasyLog.class);
         // EasyLog注解优先级最高
         if (easyLog != null) {
-            return new LogAttribute() {
-                @Override
-                public String title() {
-                    String title = StringUtils.isEmpty(easyLog.title()) ? easyLog.value() : easyLog.title();
-                    // 如果都没有定义标题使用默认标题
-                    if (StringUtils.isEmpty(title)) {
-                        title = LogUtils.createDefaultTitle(method, targetClass);
-                    }
-                    return title;
-                }
+            String title = StringUtils.isEmpty(easyLog.title()) ? easyLog.value() : easyLog.title();
+            // 如果都没有定义标题使用默认标题
+            if (StringUtils.isEmpty(title)) {
+                title = LogUtils.createDefaultTitle(method, targetClass);
+            }
 
-                @Override
-                public String handler() {
-                    return easyLog.handler();
-                }
+            // 如果注解指定是否同步优先级最高,否则读取项目默认配置值
+            boolean async = false;
+            switch (easyLog.handleMode()) {
+                case GLOBAL: async = easyLogProperties.getAsync(); break;
+                case ASYNC: async = true; break;
+                case SYNC: async = false; break;
+            }
 
-                @Override
-                public String template() {
-                    return easyLog.template();
-                }
-
-                @Override
-                public String operator() {
-                    return null;
-                }
-            };
+            return DefaultLogAttribute.builder()
+                    .title(title)
+                    .handler(easyLog.handler())
+                    .template(easyLog.template())
+                    .async(async)
+                    .build();
         }
         // 如果找不到EasyLog 检查是否开启server-debug模式
         if (isServicePublicMethod(method, targetClass)) {
             String title = LogUtils.createDefaultTitle(method, targetClass);
 
-            return buildLogAttribute( title );
+            return DefaultLogAttribute.builder()
+                    .title(title)
+                    .async(easyLogProperties.getAsync())
+                    .build();
         }
 
         return null;
@@ -68,27 +65,4 @@ public class AnnotationLogAttributeSource implements LogAttributeSource {
                 && Modifier.isPublic(method.getModifiers());
     }
 
-    private LogAttribute buildLogAttribute(String title) {
-        return new LogAttribute() {
-            @Override
-            public String title() {
-                return title;
-            }
-
-            @Override
-            public String handler() {
-                return "";
-            }
-
-            @Override
-            public String template() {
-                return "";
-            }
-
-            @Override
-            public String operator() {
-                return null;
-            }
-        };
-    }
 }

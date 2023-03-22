@@ -19,7 +19,7 @@ abstract class LogAttributeSourceConfiguration {
 
         @Bean
         public LogAttributeSource logAttributeSource(EasyLogProperties easyLogProperties) {
-            return new SwaggerLogAttributeSource(new AnnotationLogAttributeSource(easyLogProperties));
+            return new SwaggerLogAttributeSource(new AnnotationLogAttributeSource(easyLogProperties), easyLogProperties);
         }
 
     }
