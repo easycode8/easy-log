@@ -7,6 +7,10 @@ import java.util.Date;
 import java.util.Map;
 
 public class LogInfo implements LogDefinition {
+    public static final Integer STATUS_INIT = 1;
+    public static final Integer STATUS_BEFORE = 2;
+    public static final Integer STATUS_FINISH = 3;
+
     /** 日志主键*/
 //    @TableId(type = IdType.UUID)
     private String logId;
@@ -51,7 +55,7 @@ public class LogInfo implements LogDefinition {
     private String dataSnapshot;
 
     /** 日志状态*/
-    private Integer status;
+    private Integer status = 0;
 
 
     private Map<String, Object> custom;
