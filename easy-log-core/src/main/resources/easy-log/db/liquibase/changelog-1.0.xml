@@ -1,0 +1,26 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet author="easy-log" id="create.log_info" >
+        <createTable tableName="log_info">
+            <column name="log_id" remarks="日志主键ID" type="VARCHAR(32)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="type" remarks="日志类型" type="VARCHAR(20)"/>
+            <column name="status" remarks="日志状态" type="INT"/>
+            <column name="title" remarks="日志标题" type="VARCHAR(100)"/>
+            <column name="description" remarks="日志描述" type="VARCHAR(500)"/>
+            <column name="request_uri" remarks="URI" type="VARCHAR(300)"/>
+            <column name="method" remarks="请求方式" type="VARCHAR(300)"/>
+            <column name="params" remarks="提交参数" type="TEXT"/>
+            <column name="timeout" remarks="请求时长" type="VARCHAR(10)"/>
+            <column name="ip" remarks="请求IP" type="VARCHAR(20)"/>
+            <column name="exception" remarks="异常" type="TEXT"/>
+            <column name="operate_date" remarks="操作时间" type="datetime(6)"/>
+            <column name="operator" remarks="操作人" type="VARCHAR(32)"/>
+            <column name="trace_id" remarks="链路追踪ID" type="VARCHAR(36)"/>
+            <column name="data_snapshot" remarks="数据快照" type="TEXT"/>
+            <column name="tags" remarks="自定义属性标签" type="TEXT"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

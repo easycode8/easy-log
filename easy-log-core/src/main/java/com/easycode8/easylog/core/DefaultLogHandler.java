@@ -1,21 +1,23 @@
 package com.easycode8.easylog.core;
 
 import com.alibaba.fastjson.JSON;
-import com.easycode8.easylog.core.provider.OperatorProvider;
+import com.easycode8.easylog.core.aop.interceptor.LogAttribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 
-public class DefaultLogHandler extends AbstractLogDataHandler {
+public class DefaultLogHandler implements LogDataHandler<LogInfo> {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultLogHandler.class);
 
-    public DefaultLogHandler(OperatorProvider operatorProvider) {
-        super(operatorProvider);
+
+    @Override
+    public LogInfo init(LogAttribute logAttribute, Method method, Object[] args, Class<?> targetClass) {
+        return new LogInfo();
     }
 
     @Override
-    public void before(LogInfo info, Method method, Class<?> targetClass) {
+    public void before(LogInfo info, Method method, Object[] args, Class<?> targetClass) {
         LOGGER.info("[easy-log][{}]--begin content:{}", info.getTitle(), JSON.toJSONString(info));
     }
 

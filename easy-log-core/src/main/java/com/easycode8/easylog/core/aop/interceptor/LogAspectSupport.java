@@ -3,6 +3,7 @@ package com.easycode8.easylog.core.aop.interceptor;
 
 import com.easycode8.easylog.core.LogDataHandler;
 import com.easycode8.easylog.core.LogInfo;
+import com.easycode8.easylog.core.provider.OperatorProvider;
 import com.easycode8.easylog.core.util.LogUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,8 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
 
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
+    private OperatorProvider operatorProvider;
+
     @Nullable
     private BeanFactory beanFactory;
 
@@ -45,17 +48,26 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
         // 创建日志信息
         long startTime = System.currentTimeMillis();
         LogInfo info = handle.init(logAttribute, method, args, targetClass);
+        LogUtils.initLog(info, logAttribute, method, args, targetClass);
+        // 如果操作人为空,尝试从上下文获取
+        if (operatorProvider != null && StringUtils.isEmpty(info.getOperator())) {
+            info.setOperator(operatorProvider.currentOperator());
+        }
         logInfoHolder.set(info);
         info.setStatus(LogInfo.STATUS_INIT);
         Object retVal;
         try {
             // This is an around advice: Invoke the next interceptor in the chain.
             // This will normally result in a target object being invoked.
-            handle.before(info, method, targetClass);
+            handle.before(info, method, args, targetClass);
             info.setStatus(LogInfo.STATUS_BEFORE);
             retVal = invocation.proceedWithLog();
             info.setTimeout(System.currentTimeMillis() - startTime);
             info.setStatus(LogInfo.STATUS_FINISH);
+            // 如果是登录接口可能登录后才有用户信息,所以这个补充设置一次
+            if (operatorProvider != null && StringUtils.isEmpty(info.getOperator())) {
+                info.setOperator(operatorProvider.currentOperator());
+            }
             if (isAsync) {
                 threadPoolTaskExecutor.execute(() -> handle.after(info, method, targetClass));
             } else {
@@ -96,7 +108,7 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
      */
     protected LogDataHandler determineLogHandleAdapter(LogAttribute logAttribute) {
         if (logAttribute == null || this.beanFactory == null) {
-            return getLogHandleAdapter();
+            return getLogDataHandler();
         }
         String qualifier = logAttribute.handler();
         if (StringUtils.hasText(qualifier)) {
@@ -108,7 +120,7 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
             return logDataHandler;
 
         } else {
-            LogDataHandler defaultLogDataHandler = getLogHandleAdapter();
+            LogDataHandler defaultLogDataHandler = getLogDataHandler();
             if (defaultLogDataHandler == null) {
                 defaultLogDataHandler = this.beanFactory.getBean(LogDataHandler.class);
             }
@@ -132,10 +144,10 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
 
     @Override
     public void afterPropertiesSet() {
-        if (getLogHandleAdapter() == null && this.beanFactory == null) {
+        if (getLogDataHandler() == null && this.beanFactory == null) {
             throw new IllegalStateException(
-                    "Set the 'logHandleAdapter' property or make sure to run within a BeanFactory " +
-                            "containing a logHandleAdapter bean!");
+                    "Set the 'LogDataHandler' property or make sure to run within a BeanFactory " +
+                            "containing a LogDataHandler bean!");
         }
         if (getLogAttributeSource() == null) {
             throw new IllegalStateException(
@@ -157,19 +169,19 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
         this.logAttributeSource = logAttributeSource;
     }
 
-    public LogDataHandler getLogHandleAdapter() {
+    public LogDataHandler getLogDataHandler() {
         return logDataHandler;
     }
 
-    public void setLogHandleAdapter(LogDataHandler logDataHandler) {
+    public void setLogDataHandler(LogDataHandler logDataHandler) {
         this.logDataHandler = logDataHandler;
-    }
-
-    public ThreadPoolTaskExecutor getThreadPoolTaskExecutor() {
-        return threadPoolTaskExecutor;
     }
 
     public void setThreadPoolTaskExecutor(ThreadPoolTaskExecutor threadPoolTaskExecutor) {
         this.threadPoolTaskExecutor = threadPoolTaskExecutor;
+    }
+
+    public void setOperatorProvider(OperatorProvider operatorProvider) {
+        this.operatorProvider = operatorProvider;
     }
 }

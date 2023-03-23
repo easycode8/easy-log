@@ -20,12 +20,13 @@ public interface LogDataHandler<T extends LogInfo> {
     T init(LogAttribute logAttribute, Method method,  Object[] args, Class<?> targetClass);
 
     /**
-     * 执行方法前的日志处理
+     *
      * @param info
      * @param method
+     * @param args
      * @param targetClass
      */
-    void before(T info, Method method,  Class<?> targetClass);
+    void before(T info, Method method, Object[] args, Class<?> targetClass);
 
     /**
      * 执行方法后的日志处理
