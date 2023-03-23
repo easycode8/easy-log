@@ -11,17 +11,14 @@ import com.easycode8.easylog.core.provider.OperatorProvider;
 import com.easycode8.easylog.core.provider.SessionOperatorProvider;
 import org.springframework.aop.Advisor;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskDecorator;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import javax.annotation.Resource;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @Configuration
@@ -37,10 +34,15 @@ public class EasyLogConfiguration {
     }
 
     @Bean
-    public LogMethodInterceptor logMethodInterceptor(LogAttributeSource logAttributeSource, @Qualifier("logThreadPoolTaskExecutor") ThreadPoolTaskExecutor taskExecutor) {
+    public LogMethodInterceptor logMethodInterceptor(LogAttributeSource logAttributeSource,
+                                                     @Qualifier("easyLogThreadPoolTaskExecutor") ThreadPoolTaskExecutor taskExecutor,
+                                                     @Qualifier("easyLogDataHandler") LogDataHandler logDataHandler,
+                                                     ObjectProvider<OperatorProvider> operatorProvider) {
         LogMethodInterceptor logMethodInterceptor = new LogMethodInterceptor();
         logMethodInterceptor.setLogAttributeSource(logAttributeSource);
         logMethodInterceptor.setThreadPoolTaskExecutor(taskExecutor);
+        logMethodInterceptor.setLogDataHandler(logDataHandler);
+        logMethodInterceptor.setOperatorProvider(operatorProvider.getIfAvailable());
         return logMethodInterceptor;
     }
 
@@ -52,9 +54,9 @@ public class EasyLogConfiguration {
 
 
     @Bean
-    @ConditionalOnMissingBean
-    public LogDataHandler logDataHandler(ObjectProvider<OperatorProvider> operatorProvider) {
-        return new DefaultLogHandler(operatorProvider.getIfAvailable());
+    @ConditionalOnMissingBean(name = "easyLogDataHandler")
+    public LogDataHandler easyLogDataHandler() {
+        return new DefaultLogHandler();
     }
 
     @Bean
@@ -70,8 +72,8 @@ public class EasyLogConfiguration {
      * @return
      */
     @Bean
-    @ConditionalOnMissingBean(name = "logThreadPoolTaskExecutor")
-    public ThreadPoolTaskExecutor logThreadPoolTaskExecutor(EasyLogProperties easyLogProperties, ObjectProvider<TaskDecorator> objectProvider) {
+    @ConditionalOnMissingBean(name = "easyLogThreadPoolTaskExecutor")
+    public ThreadPoolTaskExecutor easyLogThreadPoolTaskExecutor(EasyLogProperties easyLogProperties, ObjectProvider<TaskDecorator> objectProvider) {
         EasyLogProperties.Task async = easyLogProperties.getTask();
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
         // 核心线程数定义了最小可以同时运行的线程数量

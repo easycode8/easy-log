@@ -7,9 +7,7 @@ import java.util.Date;
 import java.util.Map;
 
 public class LogInfo implements LogDefinition {
-    public static final Integer STATUS_INIT = 1;
-    public static final Integer STATUS_BEFORE = 2;
-    public static final Integer STATUS_FINISH = 3;
+
 
     /** 日志主键*/
 //    @TableId(type = IdType.UUID)
@@ -45,11 +43,11 @@ public class LogInfo implements LogDefinition {
     /** 请求时长*/
     private Long timeout;
 
-    /** 用户登入名*/
-    private String loginName;
+    /** 操作人*/
+    private String operator;
 
-    /** requestID*/
-    private String requestId;
+    /** 链路追踪ID(和requestId等效) 遵从OpenTracing规范使用traceId命名*/
+    private String traceId;
 
     /** 历史数据*/
     private String dataSnapshot;
@@ -148,20 +146,20 @@ public class LogInfo implements LogDefinition {
         this.timeout = timeout;
     }
 
-    public String getLoginName() {
-        return loginName;
+    public String getOperator() {
+        return operator;
     }
 
-    public void setLoginName(String loginName) {
-        this.loginName = loginName;
+    public void setOperator(String operator) {
+        this.operator = operator;
     }
 
-    public String getRequestId() {
-        return requestId;
+    public String getTraceId() {
+        return traceId;
     }
 
-    public void setRequestId(String requestId) {
-        this.requestId = requestId;
+    public void setTraceId(String traceId) {
+        this.traceId = traceId;
     }
 
     public String getDataSnapshot() {
