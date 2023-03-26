@@ -2,7 +2,9 @@ package com.easycode8.easylog.core.aop.interceptor;
 
 
 import com.easycode8.easylog.core.LogDataHandler;
+import com.easycode8.easylog.core.LogHolder;
 import com.easycode8.easylog.core.LogInfo;
+import com.easycode8.easylog.core.LogStopWatch;
 import com.easycode8.easylog.core.provider.OperatorProvider;
 import com.easycode8.easylog.core.util.LogUtils;
 import org.slf4j.Logger;
@@ -11,7 +13,6 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.BeanFactoryAnnotationUtils;
-import org.springframework.core.NamedThreadLocal;
 import org.springframework.lang.Nullable;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StringUtils;
@@ -25,7 +26,6 @@ import java.lang.reflect.Method;
 public abstract class LogAspectSupport implements BeanFactoryAware , InitializingBean {
     private static final Logger LOGGER = LoggerFactory.getLogger(LogAspectSupport.class);
 
-    private static final ThreadLocal<LogInfo> logInfoHolder = new NamedThreadLocal<>("current thread log info");
 
     private LogAttributeSource logAttributeSource;
 
@@ -40,40 +40,50 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
 
     protected Object invoke(Method method, @Nullable Class<?> targetClass,Object[] args,
                                              final InvocationCallback invocation) throws Throwable {
-        // 获取日志属性（是否强事务,日志保存成功才算业务成功）
+        // 获取日志属性
         LogAttribute logAttribute = getLogAttributeSource().getLogAttribute(method, targetClass);
-        final LogDataHandler handle = this.determineLogHandleAdapter(logAttribute);
-        boolean isAsync = logAttribute.async();
+        final LogDataHandler handler = this.determineLogHandleAdapter(logAttribute);
 
         // 创建日志信息
         long startTime = System.currentTimeMillis();
-        LogInfo info = handle.init(logAttribute, method, args, targetClass);
+        LogInfo info = handler.init(logAttribute, method, args, targetClass);
+
+        LogHolder.push(info);
+
+        String handlerName = handler.getClass().getSimpleName();
+        LogStopWatch stopWatch = new LogStopWatch(LOGGER, logAttribute.title());
+        stopWatch.start("{}.init() //日志初始化属性", handlerName);
         LogUtils.initLog(info, logAttribute, method, args, targetClass);
-        // 如果操作人为空,尝试从上下文获取
-        if (operatorProvider != null && StringUtils.isEmpty(info.getOperator())) {
-            info.setOperator(operatorProvider.currentOperator());
-        }
-        logInfoHolder.set(info);
+
+        this.chooseOperatorIfEmpty(info, operatorProvider);
+
         info.setStatus(LogInfo.STATUS_INIT);
+        boolean isAsync = logAttribute.async();
+
         Object retVal;
         try {
             // This is an around advice: Invoke the next interceptor in the chain.
             // This will normally result in a target object being invoked.
-            handle.before(info, method, args, targetClass);
+            stopWatch.stop().start("{}.before() //日志前处理", handlerName);
+            handler.before(info, method, args, targetClass);
             info.setStatus(LogInfo.STATUS_BEFORE);
+            stopWatch.stop().start("{} //{} param:{}" , info.getMethod(), info.getTitle(), info.getParams());;
+
             retVal = invocation.proceedWithLog();
             info.setTimeout(System.currentTimeMillis() - startTime);
+
+            stopWatch.stop().start(handlerName + ".after() //日志后处理");
+
             info.setStatus(LogInfo.STATUS_FINISH);
             // 如果是登录接口可能登录后才有用户信息,所以这个补充设置一次
-            if (operatorProvider != null && StringUtils.isEmpty(info.getOperator())) {
-                info.setOperator(operatorProvider.currentOperator());
-            }
+            this.chooseOperatorIfEmpty(info, operatorProvider);
             if (isAsync) {
-                threadPoolTaskExecutor.execute(() -> handle.after(info, method, targetClass));
+                threadPoolTaskExecutor.execute(() -> handler.after(info, method, targetClass));
             } else {
-                handle.after(info, method, targetClass);
+                handler.after(info, method, targetClass);
             }
 
+            stopWatch.stop().showDetail();
 
         } catch (Throwable ex) {
 
@@ -83,9 +93,9 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
             } else if (LogInfo.STATUS_BEFORE == info.getStatus()) { // 业务执行不成功记录失败原因
                 info.setException(ex.getMessage());
                 if (isAsync) {
-                    threadPoolTaskExecutor.execute(() -> handle.after(info, method, targetClass));
+                    threadPoolTaskExecutor.execute(() -> handler.after(info, method, targetClass));
                 } else {
-                    handle.after(info, method, targetClass);
+                    handler.after(info, method, targetClass);
                 }
 
             } else if (LogInfo.STATUS_FINISH == info.getStatus()) { // 业务执行成功,但是日志后处理失败,提示错误日志。这时候业务会因为异常回滚操作
@@ -94,10 +104,18 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
 
             throw ex;
         } finally {
-            logInfoHolder.remove();
+            LogHolder.poll();
         }
 
         return retVal;
+    }
+
+    protected  void chooseOperatorIfEmpty(LogInfo info, OperatorProvider operatorProvider) {
+        // 如果操作人为空,尝试从上下文获取
+        if (operatorProvider != null && StringUtils.isEmpty(info.getOperator())) {
+            info.setOperator(operatorProvider.currentOperator());
+        }
+
     }
 
 
