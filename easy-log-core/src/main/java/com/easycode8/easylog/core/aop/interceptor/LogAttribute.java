@@ -1,6 +1,8 @@
 package com.easycode8.easylog.core.aop.interceptor;
 
 
+import java.util.Map;
+
 public interface LogAttribute {
     /** 日志标题*/
     String title();
@@ -12,5 +14,7 @@ public interface LogAttribute {
     String operator();
     /** 是否异步处理日志*/
     boolean async();
+    /** 日志标签用于使用着扩展属性*/
+    Map<String, String> tags();
 
 }

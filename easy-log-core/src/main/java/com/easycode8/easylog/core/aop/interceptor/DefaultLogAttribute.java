@@ -1,6 +1,8 @@
 package com.easycode8.easylog.core.aop.interceptor;
 
 
+import java.util.Map;
+
 public class DefaultLogAttribute implements LogAttribute{
     /** 日志标题*/
     String title;
@@ -12,7 +14,8 @@ public class DefaultLogAttribute implements LogAttribute{
     String operator;
     /** 是否异步处理日志*/
     boolean async;
-
+    /** 日志标签用于使用着扩展属性*/
+    Map<String, String> tags;
 
     @Override
     public String title() {
@@ -39,6 +42,11 @@ public class DefaultLogAttribute implements LogAttribute{
         return this.async;
     }
 
+    @Override
+    public Map<String, String> tags() {
+        return this.tags;
+    }
+
 
     public static Builder builder() {
         return new Builder();
@@ -50,11 +58,14 @@ public class DefaultLogAttribute implements LogAttribute{
         String template;
         String operator;
         boolean async;
+        Map<String, String> tags;
 
         private Builder() {
         }
 
-
+        public static Builder aDefaultLogAttribute() {
+            return new Builder();
+        }
 
         public Builder title(String title) {
             this.title = title;
@@ -76,18 +87,24 @@ public class DefaultLogAttribute implements LogAttribute{
             return this;
         }
 
-        public Builder async(Boolean async) {
+        public Builder async(boolean async) {
             this.async = async;
+            return this;
+        }
+
+        public Builder tags(Map<String, String> tags) {
+            this.tags = tags;
             return this;
         }
 
         public DefaultLogAttribute build() {
             DefaultLogAttribute defaultLogAttribute = new DefaultLogAttribute();
-            defaultLogAttribute.template = this.template;
-            defaultLogAttribute.operator = this.operator;
             defaultLogAttribute.handler = this.handler;
+            defaultLogAttribute.template = this.template;
             defaultLogAttribute.title = this.title;
+            defaultLogAttribute.tags = this.tags;
             defaultLogAttribute.async = this.async;
+            defaultLogAttribute.operator = this.operator;
             return defaultLogAttribute;
         }
     }

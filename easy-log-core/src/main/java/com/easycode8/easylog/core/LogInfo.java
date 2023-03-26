@@ -1,10 +1,8 @@
 package com.easycode8.easylog.core;
 
 
-
-
 import java.util.Date;
-import java.util.Map;
+import java.util.UUID;
 
 public class LogInfo implements LogDefinition {
 
@@ -55,8 +53,8 @@ public class LogInfo implements LogDefinition {
     /** 日志状态*/
     private Integer status = 0;
 
-
-    private Map<String, Object> custom;
+    /** 日志标签用于扩展业务自定义属性*/
+    private String tags;
 
     public String getLogId() {
         return logId;
@@ -178,11 +176,11 @@ public class LogInfo implements LogDefinition {
         this.status = status;
     }
 
-    public Map<String, Object> getCustom() {
-        return custom;
+    public String getTags() {
+        return tags;
     }
 
-    public void setCustom(Map<String, Object> custom) {
-        this.custom = custom;
+    public void setTags(String tags) {
+        this.tags = tags;
     }
 }
