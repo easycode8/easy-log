@@ -40,6 +40,13 @@ public abstract class LogUtils {
         if (targetClass.getAnnotation(Service.class) != null && StringUtils.isEmpty(info.getType())) {
             info.setType("service");
         }
+        // 处理tags信息
+        if (!CollectionUtils.isEmpty(logAttribute.tags())) {
+            for (Map.Entry<String, String> item: logAttribute.tags().entrySet()) {
+                item.setValue(SpringSpelUtils.parse(method, args, item.getValue()));
+            }
+            info.setTags(JSON.toJSONString(logAttribute.tags()));
+        }
 
         info.setParams(LogUtils.buildRequestParams(request.getParameterMap(), args));
         info.setMethod(LogUtils.createDefaultTitle(method, targetClass));

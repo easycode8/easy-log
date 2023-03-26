@@ -24,4 +24,9 @@ public @interface EasyLog {
     String operator() default "";
     /** 处理日志的模式 GLOBAL:使用全局默认值 ASYNC:使用异步 SYNC:使用同步*/
     HandleMode handleMode() default HandleMode.GLOBAL;
+    /** 日志自定义标签用于记录扩展的业务值*/
+    Tag[] tags() default {@Tag(key = "", value = "")};
+
+
+
 }

@@ -2,12 +2,16 @@ package com.easycode8.easylog.core.aop.interceptor;
 
 import com.easycode8.easylog.core.annotation.EasyLog;
 import com.easycode8.easylog.core.annotation.EasyLogProperties;
+import com.easycode8.easylog.core.annotation.Tag;
 import com.easycode8.easylog.core.util.LogUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class AnnotationLogAttributeSource implements LogAttributeSource {
 
@@ -28,6 +32,17 @@ public class AnnotationLogAttributeSource implements LogAttributeSource {
             if (StringUtils.isEmpty(title)) {
                 title = LogUtils.createDefaultTitle(method, targetClass);
             }
+            Tag[] tags = easyLog.tags();
+            Map<String, String> tagMap = null;
+            if (tags != null) {
+                tagMap = Arrays.stream(tags)
+                        // 提出key为空的数据
+                        .filter(item -> StringUtils.hasText(item.key()))
+                        .map(p -> Map.entry(p.key(), p.value()))
+                        // 将 Map.Entry 对象转为 Map
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+            }
 
             // 如果注解指定是否同步优先级最高,否则读取项目默认配置值
             boolean async = false;
@@ -42,6 +57,7 @@ public class AnnotationLogAttributeSource implements LogAttributeSource {
                     .handler(easyLog.handler())
                     .template(easyLog.template())
                     .async(async)
+                    .tags(tagMap)
                     .build();
         }
         // 如果找不到EasyLog 检查是否开启server-debug模式
