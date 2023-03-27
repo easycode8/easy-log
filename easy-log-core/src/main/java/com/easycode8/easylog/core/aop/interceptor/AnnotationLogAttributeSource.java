@@ -1,15 +1,16 @@
 package com.easycode8.easylog.core.aop.interceptor;
 
+import com.easycode8.easylog.core.adapter.LogAttributeMappingAdapter;
 import com.easycode8.easylog.core.annotation.EasyLog;
 import com.easycode8.easylog.core.annotation.EasyLogProperties;
 import com.easycode8.easylog.core.annotation.Tag;
 import com.easycode8.easylog.core.util.LogUtils;
-import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -17,8 +18,11 @@ public class AnnotationLogAttributeSource implements LogAttributeSource {
 
     private final EasyLogProperties easyLogProperties;
 
-    public AnnotationLogAttributeSource(EasyLogProperties easyLogProperties) {
+    private final List<LogAttributeMappingAdapter> mappingAdapters;
+
+    public AnnotationLogAttributeSource(EasyLogProperties easyLogProperties, List<LogAttributeMappingAdapter> mappingAdapters) {
         this.easyLogProperties = easyLogProperties;
+        this.mappingAdapters = mappingAdapters;
     }
 
 
@@ -60,25 +64,18 @@ public class AnnotationLogAttributeSource implements LogAttributeSource {
                     .tags(tagMap)
                     .build();
         }
-        // 如果找不到EasyLog 检查是否开启server-debug模式
-        if (isServicePublicMethod(method, targetClass)) {
-            String title = LogUtils.createDefaultTitle(method, targetClass);
-
-            return DefaultLogAttribute.builder()
-                    .title(title)
-                    .async(easyLogProperties.getAsync())
-                    .build();
+        // 从映射适配器中获取自定义的日志属性
+        if (CollectionUtils.isEmpty(mappingAdapters)) {
+            return null;
         }
 
+        for (LogAttributeMappingAdapter mappingAdapter : mappingAdapters) {
+            LogAttribute logAttribute = mappingAdapter.getLogAttribute(method, targetClass);
+            if (logAttribute != null) {
+                return logAttribute;
+            }
+        }
         return null;
-    }
-
-
-
-    private boolean isServicePublicMethod(Method method, Class<?> targetClass) {
-        return easyLogProperties.getScanService().getEnabled() && targetClass.getAnnotation(Service.class) != null
-                && !Modifier.isStatic(method.getModifiers())
-                && Modifier.isPublic(method.getModifiers());
     }
 
 }

@@ -2,6 +2,7 @@ package com.easycode8.easylog.core.annotation;
 
 
 import com.easycode8.easylog.core.DefaultLogHandler;
+import com.easycode8.easylog.core.adapter.LogAttributeMappingAdapter;
 import com.easycode8.easylog.core.LogDataHandler;
 import com.easycode8.easylog.core.aop.BeanFactoryLogAttributeSourceAdvisor;
 import com.easycode8.easylog.core.aop.interceptor.AnnotationLogAttributeSource;
@@ -19,6 +20,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskDecorator;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @Configuration
@@ -48,8 +50,8 @@ public class EasyLogConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public LogAttributeSource logAttributeSource(EasyLogProperties easyLogProperties) {
-        return new AnnotationLogAttributeSource(easyLogProperties);
+    public LogAttributeSource logAttributeSource(EasyLogProperties easyLogProperties, List<LogAttributeMappingAdapter> mappingAdapters) {
+        return new AnnotationLogAttributeSource(easyLogProperties, mappingAdapters);
     }
 
 
