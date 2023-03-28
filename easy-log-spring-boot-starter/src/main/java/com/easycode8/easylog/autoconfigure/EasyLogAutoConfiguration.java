@@ -1,6 +1,7 @@
 package com.easycode8.easylog.autoconfigure;
 
 
+import com.easycode8.easylog.core.adapter.ControllerLogAttributeMapping;
 import com.easycode8.easylog.core.adapter.ServiceLogAttributeMapping;
 import com.easycode8.easylog.core.annotation.EasyLogProperties;
 import com.easycode8.easylog.core.annotation.EnableEasyLog;
@@ -32,6 +33,13 @@ public class EasyLogAutoConfiguration {
         @ConditionalOnProperty(value = "spring.easy-log.scan-service.enabled", havingValue = "true")
         public ServiceLogAttributeMapping serviceLogAttributeMapping(EasyLogProperties easyLogProperties) {
             return new ServiceLogAttributeMapping(easyLogProperties);
+        }
+
+        @Bean
+        @ConditionalOnMissingBean
+        @ConditionalOnProperty(value = "spring.easy-log.scan-controller.enabled", havingValue = "true")
+        public ControllerLogAttributeMapping controllerLogAttributeMapping(EasyLogProperties easyLogProperties) {
+            return new ControllerLogAttributeMapping(easyLogProperties);
         }
     }
 
