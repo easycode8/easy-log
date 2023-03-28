@@ -1,4 +1,4 @@
-package com.easycode8.easylog.mybatis.plus.interceptor;
+package com.easycode8.easylog.mybatis.plus.util;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -7,10 +7,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.easycode8.easylog.core.LogInfo;
 import com.easycode8.easylog.mybatis.plus.CompareResult;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.lang.Nullable;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -18,44 +16,25 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataLogAspectSupport {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DataLogAspectSupport.class);
+public abstract class MybatisPlusLogUtils {
+    public static final Logger LOGGER = LoggerFactory.getLogger(MybatisPlusLogUtils.class);
+    public static final String LOG_DATA_HANDLER = "mybatisPlusLogDataHandler";
 
-    public Object invoke(Object target, Class<?> targetClass, Method method, Object[] args,
-                            final InvocationCallback invocation) throws Throwable {
-        LogInfo logInfo = this.recordLog(target, targetClass, method, args);
-        long startTime = System.currentTimeMillis();
-        Object result = null;
-        try {
-            result = invocation.proceedWithLog();
-        } catch (Throwable t) {
-            if (logInfo != null) {
-                logInfo.setException(ExceptionUtils.getRootCause(t).getMessage());
-            }
-            throw t;
-        } finally {
-            long timeout = System.currentTimeMillis() - startTime;
-            logInfo.setTimeout(timeout);
-        }
-        LOGGER.debug("[easy-log]{}:\n{}", logInfo.getMethod(), JSON.toJSONString(logInfo, true));
-        return result;
-    }
+    public static LogInfo recordLog(LogInfo logInfo, Object target, Class<?> targetClass, Method method, Object[] args) {
 
-    private LogInfo recordLog(Object target, Class<?> targetClass, Method method, Object[] args) {
-        LogInfo logInfo = new LogInfo();
         BaseMapper baseMapper = (BaseMapper) target;
         String methodName = ((Class)targetClass.getGenericInterfaces()[0]).getSimpleName() + "." + method.getName();
         logInfo.setMethod(methodName);
         // TODO 后续支持更多方法
         if (methodName.contains("updateById") || methodName.contains("deleteById")) {
             LOGGER.debug("[easy-log][{}] 执行数据变化分析--开始", methodName);
-            Serializable primaryKey = this.getPrimaryKey(args[0]);
+            Serializable primaryKey = getPrimaryKey(args[0]);
             LOGGER.debug("[easy-log][{}] key:[{}] current:{}", methodName, primaryKey, JSON.toJSONString(args[0]));
             Object result = baseMapper.selectById(primaryKey);
             LOGGER.debug("[easy-log][{}] key:[{}] history:{}", methodName, primaryKey, JSON.toJSONString(result));
             if (methodName.contains("updateById")){
                 try {
-                    List<CompareResult> compareResultList = this.compareTowObject(result, args[0]);
+                    List<CompareResult> compareResultList = compareTowObject(result, args[0]);
                     logInfo.setDataSnapshot(JSON.toJSONString(compareResultList));
                     LOGGER.debug("[easy-log][{}] key:[{}] compareResult:" + JSON.toJSONString(compareResultList), methodName, primaryKey);
                     for (CompareResult compareResult : compareResultList) {
@@ -81,7 +60,7 @@ public class DataLogAspectSupport {
      * @param oldObj 旧对象
      * @param newObj 新对象
      */
-    protected List<CompareResult> compareTowObject(Object oldObj, Object newObj) throws IllegalAccessException {
+    protected static List<CompareResult> compareTowObject(Object oldObj, Object newObj) throws IllegalAccessException {
         List<CompareResult> list = new ArrayList<>();
         //获取对象的class
         Class<?> clazz1 = oldObj.getClass();
@@ -121,14 +100,30 @@ public class DataLogAspectSupport {
         return list;
     }
 
-    @FunctionalInterface
-    protected interface InvocationCallback {
 
-        @Nullable
-        Object proceedWithLog() throws Throwable;
+    /**
+     * 对比两个数据是否内容相同
+     *
+     * @param object1,object2
+     * @return boolean类型
+     */
+    private static boolean compareTwo(Object object1, Object object2) {
+
+        if (object1 == null && object2 == null) {
+            return true;
+        }
+        if (object1 == null && object2 != null) {
+            return false;
+        }
+        if (object1.equals(object2)) {
+            return true;
+        }
+        return false;
     }
 
-    private Serializable getPrimaryKey(Object et) {
+
+
+    private static Serializable getPrimaryKey(Object et) {
         // 反射获取实体类
         Class<?> clazz = et.getClass();
         // 不含有表名的实体就默认通过
@@ -162,25 +157,5 @@ public class DataLogAspectSupport {
         }
         return pkValue;
 
-    }
-
-    /**
-     * 对比两个数据是否内容相同
-     *
-     * @param object1,object2
-     * @return boolean类型
-     */
-    private boolean compareTwo(Object object1, Object object2) {
-
-        if (object1 == null && object2 == null) {
-            return true;
-        }
-        if (object1 == null && object2 != null) {
-            return false;
-        }
-        if (object1.equals(object2)) {
-            return true;
-        }
-        return false;
     }
 }
