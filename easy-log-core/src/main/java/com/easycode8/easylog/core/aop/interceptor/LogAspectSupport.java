@@ -38,7 +38,8 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
     @Nullable
     private BeanFactory beanFactory;
 
-    protected Object invoke(Method method, @Nullable Class<?> targetClass,Object[] args,
+    protected Object invoke(Method method, @Nullable Class<?> targetClass, Object[] args,
+                                             Object targetObject,
                                              final InvocationCallback invocation) throws Throwable {
         // 获取日志属性
         LogAttribute logAttribute = getLogAttributeSource().getLogAttribute(method, targetClass);
@@ -65,7 +66,7 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
             // This is an around advice: Invoke the next interceptor in the chain.
             // This will normally result in a target object being invoked.
             stopWatch.stop().start("{}.before() //日志前处理", handlerName);
-            handler.before(info, method, args, targetClass);
+            handler.before(info, method, args, targetClass, targetObject);
             info.setStatus(LogInfo.STATUS_BEFORE);
             stopWatch.stop().start("{} //{} param:{}" , info.getMethod(), info.getTitle(), info.getParams());;
 

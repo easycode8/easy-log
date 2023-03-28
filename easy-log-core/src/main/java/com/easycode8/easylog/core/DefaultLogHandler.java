@@ -17,7 +17,7 @@ public class DefaultLogHandler implements LogDataHandler<LogInfo> {
     }
 
     @Override
-    public void before(LogInfo info, Method method, Object[] args, Class<?> targetClass) {
+    public void before(LogInfo info, Method method, Object[] args, Class<?> targetClass, Object targetObject) {
         LOGGER.info("[easy-log][{}]--begin content:{}", info.getTitle(), JSON.toJSONString(info));
     }
 

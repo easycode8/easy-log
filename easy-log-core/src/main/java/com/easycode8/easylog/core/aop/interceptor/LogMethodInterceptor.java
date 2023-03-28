@@ -11,6 +11,6 @@ public class LogMethodInterceptor extends LogAspectSupport implements MethodInte
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
         Class<?> targetClass = (invocation.getThis() != null ? AopUtils.getTargetClass(invocation.getThis()) : null);
-        return invoke(invocation.getMethod(), targetClass, invocation.getArguments(), invocation::proceed);
+        return invoke(invocation.getMethod(), targetClass, invocation.getArguments(), invocation.getThis(), invocation::proceed);
     }
 }
