@@ -26,7 +26,7 @@ public interface LogDataHandler<T extends LogInfo> {
      * @param args
      * @param targetClass
      */
-    void before(T info, Method method, Object[] args, Class<?> targetClass);
+    void before(T info, Method method, Object[] args, Class<?> targetClass, Object targetObject);
 
     /**
      * 执行方法后的日志处理
