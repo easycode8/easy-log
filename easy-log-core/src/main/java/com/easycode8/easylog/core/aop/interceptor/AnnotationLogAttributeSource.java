@@ -60,6 +60,7 @@ public class AnnotationLogAttributeSource implements LogAttributeSource {
                     .title(title)
                     .handler(easyLog.handler())
                     .template(easyLog.template())
+                    .operator(easyLog.operator())
                     .async(async)
                     .tags(tagMap)
                     .build();

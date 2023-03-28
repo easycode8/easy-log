@@ -7,15 +7,18 @@ import com.easycode8.easylog.core.aop.interceptor.DefaultLogAttribute;
 import com.easycode8.easylog.core.aop.interceptor.LogAttributeSource;
 import com.easycode8.easylog.core.aop.interceptor.LogAttribute;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 
 public class SwaggerLogAttributeSource implements LogAttributeSource {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(SwaggerLogAttributeSource.class);
     final private LogAttributeSource logAttributeSource;
     final private EasyLogProperties easyLogProperties;
 
     public SwaggerLogAttributeSource(LogAttributeSource logAttributeSource, EasyLogProperties easyLogProperties) {
+        LOGGER.info("[easy-log]启动Swagger日志增强");
         this.logAttributeSource = logAttributeSource;
         this.easyLogProperties = easyLogProperties;
     }
