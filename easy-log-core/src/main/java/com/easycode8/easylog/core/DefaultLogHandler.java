@@ -22,7 +22,7 @@ public class DefaultLogHandler implements LogDataHandler<LogInfo> {
     }
 
     @Override
-    public void after(LogInfo info, Method method, Class<?> targetClass) {
+    public void after(LogInfo info, Method method, Class<?> targetClass, Object returnValue) {
         if (LogInfo.STATUS_FINISH == info.getStatus()) {
             LOGGER.info("[easy-log][{}]--end timeout:{}", info.getTitle(), info.getTimeout());
         } else {
