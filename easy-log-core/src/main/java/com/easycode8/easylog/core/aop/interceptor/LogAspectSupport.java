@@ -61,7 +61,7 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
         info.setStatus(LogInfo.STATUS_INIT);
         boolean isAsync = logAttribute.async();
 
-        Object retVal;
+        Object returnValue = null;
         try {
             // This is an around advice: Invoke the next interceptor in the chain.
             // This will normally result in a target object being invoked.
@@ -70,7 +70,7 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
             info.setStatus(LogInfo.STATUS_BEFORE);
             stopWatch.stop().start("{} //{} param:{}" , info.getMethod(), info.getTitle(), info.getParams());;
 
-            retVal = invocation.proceedWithLog();
+            returnValue = invocation.proceedWithLog();
             info.setTimeout(System.currentTimeMillis() - startTime);
 
             stopWatch.stop().start(handlerName + ".after() //日志后处理");
@@ -79,9 +79,10 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
             // 如果是登录接口可能登录后才有用户信息,所以这个补充设置一次
             this.chooseOperatorIfEmpty(info, operatorProvider);
             if (isAsync) {
-                threadPoolTaskExecutor.execute(() -> handler.after(info, method, targetClass));
+                final Object retVal = returnValue;
+                threadPoolTaskExecutor.execute(() -> handler.after(info, method, targetClass, retVal));
             } else {
-                handler.after(info, method, targetClass);
+                handler.after(info, method, targetClass, returnValue);
             }
 
             stopWatch.stop().showDetail();
@@ -94,9 +95,10 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
             } else if (LogInfo.STATUS_BEFORE == info.getStatus()) { // 业务执行不成功记录失败原因
                 info.setException(ex.getMessage());
                 if (isAsync) {
-                    threadPoolTaskExecutor.execute(() -> handler.after(info, method, targetClass));
+                    final Object retVal = returnValue;
+                    threadPoolTaskExecutor.execute(() -> handler.after(info, method, targetClass, retVal));
                 } else {
-                    handler.after(info, method, targetClass);
+                    handler.after(info, method, targetClass, returnValue);
                 }
 
             } else if (LogInfo.STATUS_FINISH == info.getStatus()) { // 业务执行成功,但是日志后处理失败,提示错误日志。这时候业务会因为异常回滚操作
@@ -108,7 +110,7 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
             LogHolder.poll();
         }
 
-        return retVal;
+        return returnValue;
     }
 
     protected  void chooseOperatorIfEmpty(LogInfo info, OperatorProvider operatorProvider) {
