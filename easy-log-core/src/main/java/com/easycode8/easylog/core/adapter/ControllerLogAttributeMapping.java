@@ -7,6 +7,7 @@ import com.easycode8.easylog.core.util.LogUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.reflect.Method;
@@ -42,7 +43,6 @@ public class ControllerLogAttributeMapping implements LogAttributeMappingAdapter
     private boolean isControllerPublicMethod(Method method, Class<?> targetClass) {
         return easyLogProperties.getScanController().getEnabled()
                 && (targetClass.getAnnotation(Controller.class) != null || targetClass.getAnnotation(RestController.class) != null)
-                && !Modifier.isStatic(method.getModifiers())
-                && Modifier.isPublic(method.getModifiers());
+                && method.getAnnotation(ResponseBody.class) != null;
     }
 }

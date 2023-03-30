@@ -64,10 +64,13 @@ public abstract class LogUtils {
         if (CollectionUtils.isEmpty(paramMap)) {
             List<String> paramList = new ArrayList<>();
             for (Object obj : args) {
-                if (!(obj instanceof Serializable)) {
-                    continue;
+                try {
+                    paramList.add(JSON.toJSONString(obj));
+                } catch (Exception e) {
+                    // 不是所有对象都支持序列化比如 HttpServletRequest
+                    paramList.add("notSerializableParam");
                 }
-                paramList.add(JSON.toJSONString(obj));
+
             }
             return Strings.join(paramList,',');
             // get 请求参数
