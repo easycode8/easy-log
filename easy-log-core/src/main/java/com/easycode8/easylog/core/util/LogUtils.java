@@ -35,6 +35,9 @@ public abstract class LogUtils {
             if (StringUtils.isEmpty(info.getType())) {
                 info.setType("web");
             }
+            info.setParams(LogUtils.buildRequestParams(request.getParameterMap(), args));
+        } else {
+            info.setParams(LogUtils.buildRequestParams(null, args));
         }
 
         if (targetClass.getAnnotation(Service.class) != null && StringUtils.isEmpty(info.getType())) {
@@ -48,7 +51,7 @@ public abstract class LogUtils {
             info.setTags(JSON.toJSONString(logAttribute.tags()));
         }
 
-        info.setParams(LogUtils.buildRequestParams(request.getParameterMap(), args));
+
         info.setMethod(LogUtils.createDefaultTitle(method, targetClass));
         String spelDescription = SpringSpelUtils.parse(method, args, logAttribute.template());
         info.setDescription(spelDescription);

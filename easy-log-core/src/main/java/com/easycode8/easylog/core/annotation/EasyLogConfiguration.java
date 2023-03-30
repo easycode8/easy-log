@@ -27,7 +27,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 @EnableConfigurationProperties(EasyLogProperties.class)
 public class EasyLogConfiguration {
     @Bean
-    public Advisor logStaticMethodMatcherPointcutAdvisor(LogAttributeSource logAttributeSource, LogMethodInterceptor logMethodInterceptor) {
+    public Advisor easyLogStaticMethodMatcherPointcutAdvisor(LogAttributeSource logAttributeSource, LogMethodInterceptor logMethodInterceptor) {
         //Advisor 是 Spring AOP 对 Advice 和 Pointcut 的抽象，可以理解为“执行通知者”，一个 Pointcut （一般对应方法）和用于“增强”它的 Advice 共同组成这个方法的一个 Advisor
         BeanFactoryLogAttributeSourceAdvisor advisor = new BeanFactoryLogAttributeSourceAdvisor();
         advisor.setLogAttributeSource(logAttributeSource);
@@ -36,7 +36,7 @@ public class EasyLogConfiguration {
     }
 
     @Bean
-    public LogMethodInterceptor logMethodInterceptor(LogAttributeSource logAttributeSource,
+    public LogMethodInterceptor easyLogMethodInterceptor(LogAttributeSource logAttributeSource,
                                                      @Qualifier("easyLogThreadPoolTaskExecutor") ThreadPoolTaskExecutor taskExecutor,
                                                      @Qualifier("easyLogDataHandler") LogDataHandler logDataHandler,
                                                      ObjectProvider<OperatorProvider> operatorProvider) {
@@ -63,7 +63,7 @@ public class EasyLogConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public OperatorProvider operatorProvider(EasyLogProperties easyLogProperties) {
+    public OperatorProvider easyLogOperatorProvider(EasyLogProperties easyLogProperties) {
         return new SessionOperatorProvider(easyLogProperties);
     }
 
