@@ -11,7 +11,6 @@
     <modules>
         <module>easy-log-core</module>
         <module>easy-log-spring-boot-starter</module>
-        <module>easy-log-sample</module>
     </modules>
 
     <properties>
