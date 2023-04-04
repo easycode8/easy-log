@@ -53,6 +53,9 @@ public class SpringSpelUtils {
      * @return 属性值
      */
     public static Object getSessionAttribute(String attributeName, String expression) {
+        if (RequestContextHolder.getRequestAttributes() == null) {
+            return null;
+        }
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         HttpSession session = request.getSession();
         // 解析表达式并获取属性值
