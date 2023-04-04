@@ -13,7 +13,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -27,9 +26,10 @@ public abstract class LogUtils {
         // 定义了操作人spel表达式则使用尝试解析
         info.setOperator(SpringSpelUtils.parse(method, args, logAttribute.operator()));
         info.setOperateDate(new Date());
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        if (targetClass.getAnnotation(Controller.class) != null || targetClass.getAnnotation(RestController.class) != null) {
 
+
+        if (RequestContextHolder.getRequestAttributes() != null && targetClass.getAnnotation(Controller.class) != null || targetClass.getAnnotation(RestController.class) != null) {
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
             info.setRequestUri( request.getRequestURI() + " [" + request.getMethod() + "]");
             info.setIp(request.getRemoteAddr());
             if (StringUtils.isEmpty(info.getType())) {
