@@ -40,6 +40,10 @@ public class ServiceLogAttributeMapping implements LogAttributeMappingAdapter{
 
 
     private boolean isServicePublicMethod(Method method, Class<?> targetClass) {
+        // 如果方法来自于Object对象忽略处理
+        if (method.getDeclaringClass().equals(Object.class)) {
+            return false;
+        }
         return easyLogProperties.getScanService().getEnabled() && targetClass.getAnnotation(Service.class) != null
                 && !Modifier.isStatic(method.getModifiers())
                 && Modifier.isPublic(method.getModifiers());

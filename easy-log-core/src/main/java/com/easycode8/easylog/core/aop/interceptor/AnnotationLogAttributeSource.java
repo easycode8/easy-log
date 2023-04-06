@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class AnnotationLogAttributeSource implements LogAttributeSource {
+public class AnnotationLogAttributeSource extends AbstractCacheLogAttributeSource {
 
     private final EasyLogProperties easyLogProperties;
 
@@ -27,7 +27,7 @@ public class AnnotationLogAttributeSource implements LogAttributeSource {
 
 
     @Override
-    public LogAttribute getLogAttribute(Method method, Class<?> targetClass) {
+    public LogAttribute doGetLogAttribute(Method method, Class<?> targetClass) {
         EasyLog easyLog = method.getAnnotation(EasyLog.class);
         // EasyLog注解优先级最高
         if (easyLog != null) {
