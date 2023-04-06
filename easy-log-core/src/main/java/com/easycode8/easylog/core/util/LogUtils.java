@@ -87,13 +87,23 @@ public abstract class LogUtils {
     }
 
     public static String createDefaultTitle(Method method, Class<?> targetClass) {
-        String title = targetClass.getSimpleName() + "." + method.getName();
+        return createDefaultTitle(method, targetClass, true);
+    }
+
+    public static String createDefaultTitle(Method method, Class<?> targetClass, boolean isSimpleName) {
+        StringBuilder title = new StringBuilder();
+        if (isSimpleName) {
+            title.append(targetClass.getSimpleName());
+        } else {
+            title.append(targetClass.getName());
+        }
+        title.append("." + method.getName());
         if (method.getParameters() != null) {
             List<String> paramNames = Arrays.stream(method.getParameters()).map(item -> item.getName()).collect(Collectors.toList());
-            title = title + "(" + Strings.join(paramNames, ',') + ")";
+            title.append("(" + Strings.join(paramNames, ',') + ")");
         } else {
-            title = title + "()";
+            title.append("()");
         }
-        return title;
+        return title.toString();
     }
 }
