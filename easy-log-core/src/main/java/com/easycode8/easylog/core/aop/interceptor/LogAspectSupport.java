@@ -43,6 +43,10 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
                                              final InvocationCallback invocation) throws Throwable {
         // 获取日志属性
         LogAttribute logAttribute = getLogAttributeSource().getLogAttribute(method, targetClass);
+        // 如果日志处理非活跃忽略增强处理
+        if (!logAttribute.active()) {
+            return invocation.proceedWithLog();
+        }
         final LogDataHandler handler = this.determineLogHandleAdapter(logAttribute);
 
         // 创建日志信息
