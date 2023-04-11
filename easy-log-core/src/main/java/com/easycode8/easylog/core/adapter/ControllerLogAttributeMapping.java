@@ -6,6 +6,7 @@ import com.easycode8.easylog.core.aop.interceptor.LogAttribute;
 import com.easycode8.easylog.core.util.LogUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,7 +17,7 @@ import java.lang.reflect.Modifier;
 /**
  * 从controller bean日志属性提取
  */
-public class ControllerLogAttributeMapping implements LogAttributeMappingAdapter{
+public class ControllerLogAttributeMapping implements LogAttributeMappingAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ControllerLogAttributeMapping.class);
     private final EasyLogProperties easyLogProperties;
@@ -28,7 +29,7 @@ public class ControllerLogAttributeMapping implements LogAttributeMappingAdapter
 
     @Override
     public LogAttribute getLogAttribute(Method method, Class<?> targetClass) {
-        if (isControllerPublicMethod(method, targetClass)) {
+        if (easyLogProperties.getScanController().getEnabled() && isControllerPublicMethod(method, targetClass)) {
             String title = LogUtils.createDefaultTitle(method, targetClass);
 
             return DefaultLogAttribute.builder()
@@ -41,8 +42,9 @@ public class ControllerLogAttributeMapping implements LogAttributeMappingAdapter
 
 
     private boolean isControllerPublicMethod(Method method, Class<?> targetClass) {
-        return easyLogProperties.getScanController().getEnabled()
-                && (targetClass.getAnnotation(Controller.class) != null || targetClass.getAnnotation(RestController.class) != null)
-                && method.getAnnotation(ResponseBody.class) != null;
+        return (targetClass.getAnnotation(Controller.class) != null && (method.getAnnotation(ResponseBody.class) != null || method.getReturnType() == ResponseEntity.class))
+                ||
+                (targetClass.getAnnotation(RestController.class) != null && !Modifier.isStatic(method.getModifiers())
+                        && Modifier.isPublic(method.getModifiers()));
     }
 }

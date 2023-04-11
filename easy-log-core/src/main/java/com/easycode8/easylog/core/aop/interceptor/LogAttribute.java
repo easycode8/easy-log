@@ -16,5 +16,7 @@ public interface LogAttribute {
     boolean async();
     /** 日志标签用于使用着扩展属性*/
     Map<String, String> tags();
+    /**是否活跃:非活跃的忽略增强处理*/
+    Boolean active();
 
 }

@@ -13,9 +13,12 @@ public class DefaultLogAttribute implements LogAttribute{
     /** 日志操作人*/
     String operator;
     /** 是否异步处理日志*/
-    boolean async;
+    Boolean async;
     /** 日志标签用于使用着扩展属性*/
     Map<String, String> tags;
+    /**是否活跃:非活跃的忽略增强处理*/
+    Boolean active = true;
+
 
     @Override
     public String title() {
@@ -45,6 +48,11 @@ public class DefaultLogAttribute implements LogAttribute{
     @Override
     public Map<String, String> tags() {
         return this.tags;
+    }
+
+    @Override
+    public Boolean active() {
+        return this.active;
     }
 
 
@@ -141,11 +149,11 @@ public class DefaultLogAttribute implements LogAttribute{
         this.operator = operator;
     }
 
-    public boolean isAsync() {
+    public Boolean getAsync() {
         return async;
     }
 
-    public void setAsync(boolean async) {
+    public void setAsync(Boolean async) {
         this.async = async;
     }
 
@@ -156,4 +164,14 @@ public class DefaultLogAttribute implements LogAttribute{
     public void setTags(Map<String, String> tags) {
         this.tags = tags;
     }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
+
 }
