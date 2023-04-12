@@ -15,10 +15,10 @@
 <div id="app-logAttribute">
     <!--logAttribute 查询 -->
     <i-Form ref="formSearchLogAttribute" :model="logAttribute.formSearch.model" :label-width="60" inline>
-        <Form-Item label="方法" prop="method">
+<!--        <Form-Item label="方法" prop="method">
             <i-Input type="text" v-model="logAttribute.formSearch.model.method" placeholder="method">
             </i-Input>
-        </Form-Item>
+        </Form-Item>-->
         <Form-Item label="标题" prop="title">
             <i-Input type="text" v-model="logAttribute.formSearch.model.title" placeholder="title">
             </i-Input>
@@ -27,35 +27,41 @@
             <i-Input type="text" v-model="logAttribute.formSearch.model.template" placeholder="template">
             </i-Input>
         </Form-Item>
-        <Form-Item label="日志处理器" prop="handler">
+<!--        <Form-Item label="日志处理器" prop="handler">
             <i-Input type="text" v-model="logAttribute.formSearch.model.handler" placeholder="handler">
             </i-Input>
         </Form-Item>
         <Form-Item label="异步" prop="async">
             <i-Input type="text" v-model="logAttribute.formSearch.model.async" placeholder="async">
             </i-Input>
-        </Form-Item>
-        <Form-Item label="操作人" prop="operator">
+        </Form-Item>-->
+<!--        <Form-Item label="操作人" prop="operator">
             <i-Input type="text" v-model="logAttribute.formSearch.model.operator" placeholder="operator">
             </i-Input>
         </Form-Item>
         <Form-Item label="tags标签" prop="tags">
             <i-Input type="text" v-model="logAttribute.formSearch.model.tags" placeholder="tags">
             </i-Input>
-        </Form-Item>
+        </Form-Item>-->
         <Form-Item label="是否启用" prop="active">
-            <i-Input type="text" v-model="logAttribute.formSearch.model.active" placeholder="active">
-            </i-Input>
+<!--            <i-Input type="text" v-model="logAttribute.formSearch.model.active" placeholder="active">-->
+<!--            </i-Input>-->
+            <i-Select v-model="logAttribute.formSearch.model.active" style="width:200px">
+                <i-Option value=" ">全部</i-Option>
+                <i-Option value="true">启用</i-Option>
+                <i-Option value="false">停用</i-Option>
+            </i-Select>
         </Form-Item>
         <Form-Item>
             <i-Button type="primary" @click="handleSearchSubmit">查询</i-Button>
             <i-Button type="primary" @click="handleResetFields('formSearchLogAttribute')">重置</i-Button>
+            <i-Button type="primary" @click="batchOperate">xxx批操作</i-Button>
         </Form-Item>
     </i-Form>
 
-    <i-Button type="primary" @click="modalShowLogAttributeAdd">添加</i-Button>
-    <i-Button type="primary" @click="batchDelete">删除</i-Button>
-    <i-Button type="primary" @click="batchOperate">xxx批操作</i-Button>
+<!--    <i-Button type="primary" @click="modalShowLogAttributeAdd">添加</i-Button>-->
+<!--    <i-Button type="primary" @click="batchDelete">删除</i-Button>-->
+
 
     <!--logAttribute 列表 -->
     <i-table size="small" :columns="logAttribute.columns" :data="logAttribute.data" @on-selection-change="onSelectionChange"></i-table>
@@ -74,63 +80,69 @@
             @on-ok="logAttributeAdd"
             @on-cancel="handleResetFields('formAddLogAttribute')">
 
-        <i-Form ref="formAddLogAttribute" :model="logAttribute.form.model" :label-width="80">
-            <Form-Item label="方法">
-                <i-Input v-model="logAttribute.form.model.method" placeholder="Enter method..."></i-Input>
-            </Form-Item>
-            <Form-Item label="标题" prop="title">
-                <i-Input v-model="logAttribute.form.model.title" placeholder="Enter title..."></i-Input>
-            </Form-Item>
-            <Form-Item label="模板" prop="template">
-                <i-Input v-model="logAttribute.form.model.template" placeholder="Enter template..."></i-Input>
-            </Form-Item>
-            <Form-Item label="日志处理器" prop="handler">
-                <i-Input v-model="logAttribute.form.model.handler" placeholder="Enter handler..."></i-Input>
-            </Form-Item>
-            <Form-Item label="异步" prop="async">
-                <i-Input v-model="logAttribute.form.model.async" placeholder="Enter async..."></i-Input>
-            </Form-Item>
-            <Form-Item label="操作人" prop="operator">
-                <i-Input v-model="logAttribute.form.model.operator" placeholder="Enter operator..."></i-Input>
-            </Form-Item>
-            <Form-Item label="tags标签" prop="tags">
-                <i-Input v-model="logAttribute.form.model.tags" placeholder="Enter tags..."></i-Input>
-            </Form-Item>
-            <Form-Item label="是否启用" prop="active">
-                <i-Input v-model="logAttribute.form.model.active" placeholder="Enter active..."></i-Input>
-            </Form-Item>
-        </i-Form>
+<!--        <i-Form ref="formAddLogAttribute" :model="logAttribute.form.model" :label-width="80">-->
+<!--            <Form-Item label="方法">-->
+<!--                <i-Input v-model="logAttribute.form.model.method" placeholder="Enter method..."></i-Input>-->
+<!--            </Form-Item>-->
+<!--            <Form-Item label="标题" prop="title">-->
+<!--                <i-Input v-model="logAttribute.form.model.title" placeholder="Enter title..."></i-Input>-->
+<!--            </Form-Item>-->
+<!--            <Form-Item label="模板" prop="template">-->
+<!--                <i-Input v-model="logAttribute.form.model.template" placeholder="Enter template..."></i-Input>-->
+<!--            </Form-Item>-->
+<!--            <Form-Item label="日志处理器" prop="handler">-->
+<!--                <i-Input v-model="logAttribute.form.model.handler" placeholder="Enter handler..."></i-Input>-->
+<!--            </Form-Item>-->
+<!--            <Form-Item label="异步" prop="async">-->
+<!--                <i-Input v-model="logAttribute.form.model.async" placeholder="Enter async..."></i-Input>-->
+<!--            </Form-Item>-->
+<!--            <Form-Item label="操作人" prop="operator">-->
+<!--                <i-Input v-model="logAttribute.form.model.operator" placeholder="Enter operator..."></i-Input>-->
+<!--            </Form-Item>-->
+<!--            <Form-Item label="tags标签" prop="tags">-->
+<!--                <i-Input v-model="logAttribute.form.model.tags" placeholder="Enter tags..."></i-Input>-->
+<!--            </Form-Item>-->
+<!--            <Form-Item label="是否启用" prop="active">-->
+<!--                <i-Input v-model="logAttribute.form.model.active" placeholder="Enter active..."></i-Input>-->
+<!--            </Form-Item>-->
+<!--        </i-Form>-->
     </Modal>
 
     <Modal
             v-model="logAttribute.form.isEditModalShow"
-            title="Edit LogAttribute"
+            title="修改"
             @on-ok="logAttributeEdit"
             @on-cancel="handleResetFields('formEditLogAttribute')">
         <i-Form ref="formEditLogAttribute" :model="logAttribute.form.model" :label-width="80">
             <Form-Item label="方法">
-                <i-Input v-model="logAttribute.form.model.method" placeholder="Enter method..."></i-Input>
+                <i-Input v-model="logAttribute.form.model.method" placeholder="Enter method..." type="textarea" readonly="true"></i-Input>
             </Form-Item>
             <Form-Item label="标题">
-                <i-Input v-model="logAttribute.form.model.title" placeholder="Enter title..."></i-Input>
+                <i-Input v-model="logAttribute.form.model.title" placeholder="Enter title..." readonly="true" ></i-Input>
             </Form-Item>
             <Form-Item label="模板">
-                <i-Input v-model="logAttribute.form.model.template" placeholder="Enter template..."></i-Input>
+                <i-Input v-model="logAttribute.form.model.template" placeholder="Enter template..." readonly="true"></i-Input>
             </Form-Item>
             <Form-Item label="日志处理器">
-                <i-Input v-model="logAttribute.form.model.handler" placeholder="Enter handler..."></i-Input>
+<!--                <i-Input v-model="logAttribute.form.model.handler" placeholder="Enter handler..."></i-Input>-->
+                <i-Select v-model="logAttribute.form.model.handler" style="width:200px">
+                    <i-Option v-for="item in param.handler" :value="item" :key="item">{{item}}</i-Option>
+                </i-Select>
             </Form-Item>
+
             <Form-Item label="异步">
-                <i-Input v-model="logAttribute.form.model.async" placeholder="Enter async..."></i-Input>
+<!--                <i-Input v-model="logAttribute.form.model.async" placeholder="Enter async..."></i-Input>-->
+                <i-switch v-model="logAttribute.form.model.async" ></i-switch>
             </Form-Item>
-            <Form-Item label="操作人">
+<!--            <Form-Item label="操作人">
                 <i-Input v-model="logAttribute.form.model.operator" placeholder="Enter operator..."></i-Input>
             </Form-Item>
             <Form-Item label="tags标签">
                 <i-Input v-model="logAttribute.form.model.tags" placeholder="Enter tags..."></i-Input>
-            </Form-Item>
+            </Form-Item>-->
             <Form-Item label="是否启用">
-                <i-Input v-model="logAttribute.form.model.active" placeholder="Enter active..."></i-Input>
+<!--                <i-Input v-model="logAttribute.form.model.active" placeholder="Enter active..."></i-Input>-->
+                <i-switch v-model="logAttribute.form.model.active" ></i-switch>
             </Form-Item>
         </i-Form>
     </Modal>
@@ -181,6 +193,7 @@
     var logAttributeVM = new Vue({
         el: '#app-logAttribute',
         data: {
+            param:{},
             logAttribute:{
                 // 列表数据
                 data:[],
@@ -195,12 +208,63 @@
                         align: 'center'
                     },
                     // {title:'方法', key:'method',width: 250},
-                    {title:'标题', key:'title', width: 300},
-                    {title:'模板', key:'template'},
+                    {title:'标题', key:'title', width: 300,
+                        render: (h, params) => {
+                            return h('div', [
+                                h('span', {
+                                    style: {
+                                        display: 'inline-block',
+                                        width: '100%',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap'
+                                    },
+                                    domProps: {
+                                        title: params.row.method
+                                    }
+                                }, params.row.title)
+                            ]);
+                        }
+                    },
+                    {title:'模板', key:'template', ellipsis: true,
+                        render: (h, params) => {
+                            return h('div', [
+                                h('span', {
+                                    style: {
+                                        display: 'inline-block',
+                                        width: '100%',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap'
+                                    },
+                                    domProps: {
+                                        title: params.row.template
+                                    }
+                                }, params.row.template)
+                            ]);
+                        }
+                    },
                     {title:'日志处理器', key:'handler'},
                     {title:'异步', key:'async'},
                     // {title:'操作人', key:'operator'},
-                    {title:'tags标签', key:'tags'},
+                    {title:'tags标签', key:'tags', ellipsis: true,
+                        render: (h, params) => {
+                            return h('div', [
+                                h('span', {
+                                    style: {
+                                        display: 'inline-block',
+                                        width: '100%',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap'
+                                    },
+                                    domProps: {
+                                        title: JSON.stringify(params.row.tags)
+                                    }
+                                }, JSON.stringify(params.row.tags))
+                            ]);
+                        }
+                    },
                     {title:'是否启用', key:'active'},
                     {
                         title: '操作',
@@ -288,6 +352,7 @@
             }
         },
         created: function () {
+            this.loadParam();
             this.loadLogAttributes(this.logAttribute.pageNum, this.logAttribute.pageSize);
         },
         methods: {
@@ -303,13 +368,20 @@
             //分页加载数据
             loadLogAttributes: function (pageNum, pageSize) {
                 var vm = this;
-                var params = { pageNum: pageNum, pageSize: pageSize};
+                var params = { pageIndex: pageNum, pageSize: pageSize};
                 Object.assign(params, this.logAttribute.formSearch.model);
                 this.axios.get('easy-log/list',{
                     params:params
                 }).then(function (response) {
-                    vm.logAttribute.data = response.data.data;
-                    vm.logAttribute.total = response.data.total;
+                    vm.logAttribute.data = response.data.data.rows;
+                    vm.logAttribute.total = response.data.data.total;
+                })
+            },
+            //加载系统参数
+            loadParam: function () {
+                var vm = this;
+                this.axios.get('easy-log/param').then(function (response) {
+                    vm.param = response.data.data;
                 })
             },
             //页码变更
