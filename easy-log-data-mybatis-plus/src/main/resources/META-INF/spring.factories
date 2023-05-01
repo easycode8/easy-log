@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.easycode8.easylog.mybatis.plus.autoconfigure.MybatisPlusDataLogConfiguration
+  com.easycode8.easylog.mybatis.plus.autoconfigure.MybatisPlusDataLogConfiguration, \
+  com.easycode8.easylog.mybatis.MybatisDataLogAutoConfiguration
