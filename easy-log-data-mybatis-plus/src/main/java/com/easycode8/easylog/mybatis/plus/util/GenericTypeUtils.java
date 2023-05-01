@@ -16,7 +16,8 @@ public class GenericTypeUtils {
         for (Type type : interfaces) {
             if (type instanceof ParameterizedType) {
                 ParameterizedType parameterizedType = (ParameterizedType) type;
-                if (parameterizedType.getRawType() == interfaceClass) {
+
+                if (interfaceClass.isAssignableFrom((Class<?>) parameterizedType.getRawType())) {
                     Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
                     if (actualTypeArguments != null && actualTypeArguments.length > 0) {
                         Type typeArgument = actualTypeArguments[0];

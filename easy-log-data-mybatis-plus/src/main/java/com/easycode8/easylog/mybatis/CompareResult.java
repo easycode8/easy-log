@@ -1,4 +1,4 @@
-package com.easycode8.easylog.mybatis.plus;
+package com.easycode8.easylog.mybatis;
 
 public class CompareResult {
 
