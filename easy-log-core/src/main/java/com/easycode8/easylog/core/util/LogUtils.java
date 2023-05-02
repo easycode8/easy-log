@@ -1,6 +1,7 @@
 package com.easycode8.easylog.core.util;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.easycode8.easylog.core.LogInfo;
 import com.easycode8.easylog.core.aop.interceptor.LogAttribute;
 import org.apache.logging.log4j.util.Strings;
@@ -45,10 +46,11 @@ public abstract class LogUtils {
         }
         // 处理tags信息
         if (!CollectionUtils.isEmpty(logAttribute.tags())) {
+            JSONObject tags = new JSONObject();
             for (Map.Entry<String, String> item: logAttribute.tags().entrySet()) {
-                item.setValue(SpringSpelUtils.parse(method, args, item.getValue()));
+                tags.put(item.getKey(), SpringSpelUtils.parse(method, args, item.getValue()));
             }
-            info.setTags(JSON.toJSONString(logAttribute.tags()));
+            info.setTags(JSON.toJSONString(tags));
         }
 
 
