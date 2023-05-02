@@ -15,6 +15,10 @@ public class EasyLogProperties {
     /**是否开启默认异步记录日志 默认false*/
     private Boolean async = false;
 
+    // spring顺序默认是Ordered.LOWEST_PRECEDENCE(Integer.MAX_VALUE)优先级最低，如果两个aspect顺序一样，则使用bean注册的顺序
+    /**切面的顺序 值越小越先执行Integer.MIN_VALUE 优先级最高, 设置为0 比一般spring 默认最低优先级高*/
+    private Integer aspectOrder = 0;
+
     private Task task = new Task();
 
     private ScanSwagger scanSwagger;
@@ -69,6 +73,14 @@ public class EasyLogProperties {
 
     public void setTask(Task task) {
         this.task = task;
+    }
+
+    public Integer getAspectOrder() {
+        return aspectOrder;
+    }
+
+    public void setAspectOrder(Integer aspectOrder) {
+        this.aspectOrder = aspectOrder;
     }
 
     public static class Task {
