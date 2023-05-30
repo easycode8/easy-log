@@ -37,20 +37,22 @@ public class EasyLogController {
     @Autowired
     private ApplicationContext applicationContext;
 
-    @GetMapping()
-    public String index(HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+    //TODO暂时使用META-INF/resources/easy-log-ui.html替代保障静态资源不与thymeleaf技术耦合
 
-        String apiPrefix = "/";
-        model.addAttribute("apiUrl", apiPrefix);
-        Map<String, Object> front = new HashMap<>();
-
-        front.put("iview_css", apiPrefix + "webjars/easy-log/iview/style/iview.css");
-        front.put("iview_js", apiPrefix + "webjars/easy-log/iview/iview.min.js");
-        front.put("vue_js", apiPrefix + "webjars/easy-log/vue/vue.js");
-        front.put("axios_js", apiPrefix + "webjars/easy-log/axios/axios.min.js");
-        model.addAttribute("front", front);
-        return "easy-log";
-    }
+//    @GetMapping()
+//    public String index(HttpServletRequest request, HttpServletResponse response, ModelMap model) {
+//
+//        String apiPrefix = "/";
+//        model.addAttribute("apiUrl", apiPrefix);
+//        Map<String, Object> front = new HashMap<>();
+//
+//        front.put("iview_css", apiPrefix + "webjars/easy-log/iview/style/iview.css");
+//        front.put("iview_js", apiPrefix + "webjars/easy-log/iview/iview.min.js");
+//        front.put("vue_js", apiPrefix + "webjars/easy-log/vue/vue.js");
+//        front.put("axios_js", apiPrefix + "webjars/easy-log/axios/axios.min.js");
+//        model.addAttribute("front", front);
+//        return "easy-log";
+//    }
 
     @GetMapping("/list")
     public ResponseEntity<Map<String, Object>> list(LogAttributeParam param, PageInfo<Map<String, Object>> pageInfo) {
