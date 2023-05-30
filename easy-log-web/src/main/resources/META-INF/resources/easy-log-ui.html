@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>easy log</title>
+
+    <script type="text/javascript" th:src="${front.vue_js}" src="webjars/easy-log/vue/vue.js"></script>
+    <script type="text/javascript" th:src="${front.axios_js}" src="webjars/easy-log/axios/axios.min.js"></script>
+    <link th:href="${front.iview_css}" rel="stylesheet" href="webjars/easy-log/iview/style/iview.css"/>
+    <script type="text/javascript" th:src="${front.iview_js}" src="webjars/easy-log/iview/iview.min.js"></script>
+<!--    <script type="text/javascript" src="webjars/easy-log/easylog.js"></script>-->
+</head>
+<body>
+
+
+<div id="app-logAttribute">
+    <!--logAttribute 查询 -->
+    <i-Form ref="formSearchLogAttribute" :model="logAttribute.formSearch.model" :label-width="60" inline>
+<!--        <Form-Item label="方法" prop="method">
+            <i-Input type="text" v-model="logAttribute.formSearch.model.method" placeholder="method">
+            </i-Input>
+        </Form-Item>-->
+        <Form-Item label="标题" prop="title">
+            <i-Input type="text" v-model="logAttribute.formSearch.model.title" placeholder="title">
+            </i-Input>
+        </Form-Item>
+        <Form-Item label="模板" prop="template">
+            <i-Input type="text" v-model="logAttribute.formSearch.model.template" placeholder="template">
+            </i-Input>
+        </Form-Item>
+<!--        <Form-Item label="日志处理器" prop="handler">
+            <i-Input type="text" v-model="logAttribute.formSearch.model.handler" placeholder="handler">
+            </i-Input>
+        </Form-Item>
+        <Form-Item label="异步" prop="async">
+            <i-Input type="text" v-model="logAttribute.formSearch.model.async" placeholder="async">
+            </i-Input>
+        </Form-Item>-->
+<!--        <Form-Item label="操作人" prop="operator">
+            <i-Input type="text" v-model="logAttribute.formSearch.model.operator" placeholder="operator">
+            </i-Input>
+        </Form-Item>
+        <Form-Item label="tags标签" prop="tags">
+            <i-Input type="text" v-model="logAttribute.formSearch.model.tags" placeholder="tags">
+            </i-Input>
+        </Form-Item>-->
+        <Form-Item label="是否启用" prop="active">
+<!--            <i-Input type="text" v-model="logAttribute.formSearch.model.active" placeholder="active">-->
+<!--            </i-Input>-->
+            <i-Select v-model="logAttribute.formSearch.model.active" style="width:200px">
+                <i-Option value=" ">全部</i-Option>
+                <i-Option value="true">启用</i-Option>
+                <i-Option value="false">停用</i-Option>
+            </i-Select>
+        </Form-Item>
+        <Form-Item>
+            <i-Button type="primary" @click="handleSearchSubmit">查询</i-Button>
+            <i-Button type="primary" @click="handleResetFields('formSearchLogAttribute')">重置</i-Button>
+            <i-Button type="primary" @click="batchOperate">xxx批操作</i-Button>
+        </Form-Item>
+    </i-Form>
+
+<!--    <i-Button type="primary" @click="modalShowLogAttributeAdd">添加</i-Button>-->
+<!--    <i-Button type="primary" @click="batchDelete">删除</i-Button>-->
+
+
+    <!--logAttribute 列表 -->
+    <i-table size="small" :columns="logAttribute.columns" :data="logAttribute.data" @on-selection-change="onSelectionChange"></i-table>
+
+    <!-- 分页操作-->
+    <div style="margin: 10px;overflow: hidden">
+        <div style="float: right;">
+            <Page show-total show-elevator show-sizer :total="logAttribute.total" :current="logAttribute.pageNum" :page-size="logAttribute.pagSize" @on-change="logAttributeChangePage" @on-page-size-change="logAttributeChangePageSize"></Page>
+        </div>
+    </div>
+
+    <!-- 添加模态框-->
+    <Modal
+            v-model="logAttribute.form.isAddModalShow"
+            title="Add LogAttribute"
+            @on-ok="logAttributeAdd"
+            @on-cancel="handleResetFields('formAddLogAttribute')">
+
+<!--        <i-Form ref="formAddLogAttribute" :model="logAttribute.form.model" :label-width="80">-->
+<!--            <Form-Item label="方法">-->
+<!--                <i-Input v-model="logAttribute.form.model.method" placeholder="Enter method..."></i-Input>-->
+<!--            </Form-Item>-->
+<!--            <Form-Item label="标题" prop="title">-->
+<!--                <i-Input v-model="logAttribute.form.model.title" placeholder="Enter title..."></i-Input>-->
+<!--            </Form-Item>-->
+<!--            <Form-Item label="模板" prop="template">-->
+<!--                <i-Input v-model="logAttribute.form.model.template" placeholder="Enter template..."></i-Input>-->
+<!--            </Form-Item>-->
+<!--            <Form-Item label="日志处理器" prop="handler">-->
+<!--                <i-Input v-model="logAttribute.form.model.handler" placeholder="Enter handler..."></i-Input>-->
+<!--            </Form-Item>-->
+<!--            <Form-Item label="异步" prop="async">-->
+<!--                <i-Input v-model="logAttribute.form.model.async" placeholder="Enter async..."></i-Input>-->
+<!--            </Form-Item>-->
+<!--            <Form-Item label="操作人" prop="operator">-->
+<!--                <i-Input v-model="logAttribute.form.model.operator" placeholder="Enter operator..."></i-Input>-->
+<!--            </Form-Item>-->
+<!--            <Form-Item label="tags标签" prop="tags">-->
+<!--                <i-Input v-model="logAttribute.form.model.tags" placeholder="Enter tags..."></i-Input>-->
+<!--            </Form-Item>-->
+<!--            <Form-Item label="是否启用" prop="active">-->
+<!--                <i-Input v-model="logAttribute.form.model.active" placeholder="Enter active..."></i-Input>-->
+<!--            </Form-Item>-->
+<!--        </i-Form>-->
+    </Modal>
+
+    <Modal
+            v-model="logAttribute.form.isEditModalShow"
+            title="修改"
+            @on-ok="logAttributeEdit"
+            @on-cancel="handleResetFields('formEditLogAttribute')">
+        <i-Form ref="formEditLogAttribute" :model="logAttribute.form.model" :label-width="80">
+            <Form-Item label="方法">
+                <i-Input v-model="logAttribute.form.model.method" placeholder="Enter method..." type="textarea" readonly></i-Input>
+            </Form-Item>
+            <Form-Item label="标题">
+                <i-Input v-model="logAttribute.form.model.title" placeholder="Enter title..." readonly ></i-Input>
+            </Form-Item>
+            <Form-Item label="模板">
+                <i-Input v-model="logAttribute.form.model.template" placeholder="Enter template..." readonly></i-Input>
+            </Form-Item>
+            <Form-Item label="日志处理器">
+<!--                <i-Input v-model="logAttribute.form.model.handler" placeholder="Enter handler..."></i-Input>-->
+                <i-Select v-model="logAttribute.form.model.handler" style="width:200px">
+                    <i-Option v-for="item in param.handler" :value="item" :key="item">{{item}}</i-Option>
+                </i-Select>
+            </Form-Item>
+
+            <Form-Item label="异步">
+<!--                <i-Input v-model="logAttribute.form.model.async" placeholder="Enter async..."></i-Input>-->
+                <i-switch v-model="logAttribute.form.model.async" ></i-switch>
+            </Form-Item>
+<!--            <Form-Item label="操作人">
+                <i-Input v-model="logAttribute.form.model.operator" placeholder="Enter operator..."></i-Input>
+            </Form-Item>
+            <Form-Item label="tags标签">
+                <i-Input v-model="logAttribute.form.model.tags" placeholder="Enter tags..."></i-Input>
+            </Form-Item>-->
+            <Form-Item label="是否启用">
+<!--                <i-Input v-model="logAttribute.form.model.active" placeholder="Enter active..."></i-Input>-->
+                <i-switch v-model="logAttribute.form.model.active" ></i-switch>
+            </Form-Item>
+        </i-Form>
+    </Modal>
+</div>
+</body>
+<script>
+    //全局变量
+    Vue.prototype.baseUrl = "/";
+
+
+    var springfox = {
+        "getBaseUrl": function() {
+            var baseUrl;
+            if (baseUrl === undefined) {
+                var urlMatches = /(.*)\/easy-log-ui.html.*/.exec(window.location.href);
+                baseUrl = urlMatches[1];
+            }
+            return baseUrl;
+        }
+    };
+    console.log(springfox.getBaseUrl())
+    Vue.prototype.baseUrl = springfox.getBaseUrl()
+
+    Date.prototype.Format = function(fmt) { //
+        let o = {
+            "M+" : this.getMonth()+1,                 //月份
+            "d+" : this.getDate(),                    //日
+            "h+" : this.getHours(),                   //小时
+            "m+" : this.getMinutes(),                 //分
+            "s+" : this.getSeconds(),                 //秒
+            "q+" : Math.floor((this.getMonth()+3)/3), //季度
+            "S"  : this.getMilliseconds()             //毫秒
+        };
+        if(/(y+)/.test(fmt))
+            fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
+        for(var k in o)
+            if(new RegExp("("+ k +")").test(fmt))
+                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+        return fmt;
+    }
+
+
+    //封装axios
+    const instance = axios.create({
+        baseURL: Vue.prototype.baseUrl,
+        timeout: 1000000,
+        withCredentials: true//跨域
+    });
+    // 添加响应拦截器
+    instance.interceptors.response.use(function (response) {
+        // 对响应数据做点什么
+        return response;
+    }, function (error) {
+        // 对响应错误做点什么
+        if(error.status ==403 ) {
+            window.location.href="./vue-login.html";
+        }
+        //return Promise.reject(error);
+    });
+    Vue.prototype.axios = instance;
+
+    var logAttributeVM = new Vue({
+        el: '#app-logAttribute',
+        data: {
+            param:{},
+            logAttribute:{
+                // 列表数据
+                data:[],
+                pageNum:1,
+                pageSize:10,
+                total:10,
+                columns:[
+                    // 行勾选框
+                    {
+                        type: 'selection',
+                        width: 60,
+                        align: 'center'
+                    },
+                    // {title:'方法', key:'method',width: 250},
+                    {title:'标题', key:'title', width: 300,
+                        render: (h, params) => {
+                            return h('div', [
+                                h('span', {
+                                    style: {
+                                        display: 'inline-block',
+                                        width: '100%',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap'
+                                    },
+                                    domProps: {
+                                        title: params.row.method
+                                    }
+                                }, params.row.title)
+                            ]);
+                        }
+                    },
+                    {title:'模板', key:'template', ellipsis: true,
+                        render: (h, params) => {
+                            return h('div', [
+                                h('span', {
+                                    style: {
+                                        display: 'inline-block',
+                                        width: '100%',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap'
+                                    },
+                                    domProps: {
+                                        title: params.row.template
+                                    }
+                                }, params.row.template)
+                            ]);
+                        }
+                    },
+                    {title:'日志处理器', key:'handler'},
+                    {title:'异步', key:'async'},
+                    // {title:'操作人', key:'operator'},
+                    {title:'tags标签', key:'tags', ellipsis: true,
+                        render: (h, params) => {
+                            return h('div', [
+                                h('span', {
+                                    style: {
+                                        display: 'inline-block',
+                                        width: '100%',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap'
+                                    },
+                                    domProps: {
+                                        title: JSON.stringify(params.row.tags)
+                                    }
+                                }, JSON.stringify(params.row.tags))
+                            ]);
+                        }
+                    },
+                    {title:'是否启用', key:'active'},
+                    {
+                        title: '操作',
+                        key: 'action',
+                        width: 200,
+                        align: 'center',
+                        render: (h, params) => {
+                            return h('div', [
+                                h('Button', {
+                                    props: {type: 'success', size: 'small'},
+                                    style: {marginRight: '5px'},
+                                    on: {
+                                        click: () => {
+                                            logAttributeVM.modalShowLogAttributeEdit(params.index);
+                                        }
+                                    }
+                                }, '修改')
+                                // ,
+                                // h('Button', {props: {type: 'error', size: 'small'
+                                //     },
+                                //     on: {
+                                //         click: () => {
+                                //             logAttributeVM.logAttributeRemove(params.index)
+                                //         }
+                                //     }
+                                // }, 'Delete')
+                            ]);
+                        }
+                    }
+                ],
+                // 被选中行
+                selectedItem:[],
+                // 查询表单模型
+                formSearch:{
+                    model:{
+                        title: '',
+                        template: '',
+                        handler: '',
+                        async: '',
+                        operator: '',
+                        tags: '',
+                        active: ''
+                    }
+                },
+                // 添加/修改表单模型
+                form:{
+                    isEditModalShow:false,
+                    isAddModalShow:false,
+                    model:{
+                        method: '',
+                        title: '',
+                        template: '',
+                        handler: '',
+                        async: '',
+                        operator: '',
+                        tags: '',
+                        active: ''
+                    },
+                    rules:{
+                        title: [
+                            { required: true, message: 'Please fill in the title', trigger: 'blur' }
+                        ],
+                        template: [
+                            { required: true, message: 'Please fill in the template', trigger: 'blur' }
+                        ],
+                        handler: [
+                            { required: true, message: 'Please fill in the handler', trigger: 'blur' }
+                        ],
+                        async: [
+                            { required: true, message: 'Please fill in the async', trigger: 'blur' }
+                        ],
+                        operator: [
+                            { required: true, message: 'Please fill in the operator', trigger: 'blur' }
+                        ],
+                        tags: [
+                            { required: true, message: 'Please fill in the tags', trigger: 'blur' }
+                        ],
+                        active: [
+                            { required: true, message: 'Please fill in the active', trigger: 'blur' }
+                        ]
+                    }
+
+
+                }
+            }
+        },
+        created: function () {
+            this.loadParam();
+            this.loadLogAttributes(this.logAttribute.pageNum, this.logAttribute.pageSize);
+        },
+        methods: {
+            // 重置表单
+            handleResetFields(name) {
+                var vm = this;
+                this.$refs[name].resetFields();
+            },
+            // 提交查询
+            handleSearchSubmit() {
+                this.loadLogAttributes(0, this.logAttribute.pageSize);
+            },
+            //分页加载数据
+            loadLogAttributes: function (pageNum, pageSize) {
+                var vm = this;
+                var params = { pageIndex: pageNum, pageSize: pageSize};
+                Object.assign(params, this.logAttribute.formSearch.model);
+                this.axios.get('easy-log/list',{
+                    params:params
+                }).then(function (response) {
+                    vm.logAttribute.data = response.data.data.rows;
+                    vm.logAttribute.total = response.data.data.total;
+                })
+            },
+            //加载系统参数
+            loadParam: function () {
+                var vm = this;
+                this.axios.get('easy-log/param').then(function (response) {
+                    vm.param = response.data.data;
+                })
+            },
+            //页码变更
+            logAttributeChangePage:function (val) {
+                this.logAttribute.pageNum = val;
+                this.loadLogAttributes(this.logAttribute.pageNum, this.logAttribute.pageSize);
+                console.log(val);
+            },
+            //页大小变更
+            logAttributeChangePageSize:function (val) {
+                this.logAttribute.pageSize = val;
+                this.loadLogAttributes(this.logAttribute.pageNum, this.logAttribute.pageSize);
+                console.log(val);
+            },
+            // 添加数据
+            logAttributeAdd: function () {
+                var vm = this;
+                var model = vm.logAttribute.form.model;
+                this.axios.post('logAttribute/add',{
+                    title: model.title,
+                    template: model.template,
+                    handler: model.handler,
+                    async: model.async,
+                    operator: model.operator,
+                    tags: model.tags,
+                    active: model.active
+                }).then(function (response) {
+                    vm.$Modal.success({
+                        title: '提示',
+                        content: response.data.msg
+                    });
+                    vm.loadLogAttributes(0, vm.logAttribute.pageSize);
+                }).catch(function (error) {
+                    vm.$Modal.warning({
+                        title: '提示',
+                        content: error.data.msg
+                    });
+                })
+            },
+            // 修改数据
+            logAttributeEdit: function () {
+                var vm = this;
+                var model = vm.logAttribute.form.model;
+                this.axios.post('easy-log/update',{
+                    method: model.method,
+                    title: model.title,
+                    template: model.template,
+                    handler: model.handler,
+                    async: model.async,
+                    operator: model.operator,
+                    tags: model.tags,
+                    active: model.active
+                }).then(function (response) {
+                    vm.$Modal.success({
+                        title: '提示',
+                        content: response.data.msg
+                    });
+                    vm.loadLogAttributes(vm.logAttribute.pageNum, vm.logAttribute.pageSize);
+                }).catch(function (error) {
+                    vm.$Modal.warning({
+                        title: '提示',
+                        content: error.data.msg
+                    });
+                })
+            },
+            // 显示详情
+            logAttributeShow (index) {
+                var record = this.logAttribute.data[index];
+                this.$Modal.info({
+                    title: 'log Info',
+                    content: `内容省略`
+                })
+            },
+            // 删除记录
+            logAttributeRemove (index) {
+                var vm = this;
+                var record = this.logAttribute.data[index];
+                this.logAttribute.data.splice(index, 1);
+                this.axios.delete('logAttribute/delete',{
+                    params:{
+                        title: record.title,
+                        template: record.template,
+                        handler: record.handler,
+                        async: record.async,
+                        operator: record.operator,
+                        tags: record.tags,
+                        active: record.active
+                    }
+                }).then(function (response) {
+                    if (response.data.success) {
+                        vm.$Modal.success({
+                            title: '提示',
+                            content: response.data.msg
+                        });
+                    } else {
+                        vm.$Modal.warning({
+                            title: '提示',
+                            content: response.data.msg
+                        });
+                        vm.loadLogAttributes(vm.logAttribute.pageNum, vm.logAttribute.pageSize);
+                    }
+                })
+            },
+            // 多选数据变化,批量删除依赖
+            onSelectionChange(selection) {
+                this.logAttribute.selectedItem = selection;
+                console.log(selection);
+            },
+            // 批量删除
+            batchDelete () {
+                var vm = this;
+                var records = this.logAttribute.selectedItem;
+                this.axios.delete('logAttribute/batchDelete', {
+                    data: records
+                }).then(function (response) {
+                    if (response.data.success) {
+                        vm.$Modal.success({
+                            title: '提示',
+                            content: response.data.msg
+                        });
+                    } else {
+                        vm.$Modal.warning({
+                            title: '提示',
+                            content: response.data.msg
+                        });
+                    }
+                    vm.loadLogAttributes(vm.logAttribute.pageNum, vm.logAttribute.pageSize);
+                })
+            },
+            // xxx批量操作
+            batchOperate () {
+                var vm = this;
+                var records = this.logAttribute.selectedItem;
+                vm.$Modal.warning({
+                    title: '提示',
+                    content: JSON.stringify(records) + '<br>后端需要实现/batchOperate接口'
+                });
+                this.axios.post('logAttribute/batchOperate', records).then(function (response) {
+                    if (response.data.success) {
+                        vm.$Modal.success({
+                            title: '提示',
+                            content: response.data.msg
+                        });
+                    } else {
+                        vm.$Modal.warning({
+                            title: '提示',
+                            content: response.data.msg
+                        });
+                    }
+                    vm.loadLogAttributes(vm.logAttribute.pageNum, vm.logAttribute.pageSize);
+                })
+            },
+
+            // 模态添加框显示
+            modalShowLogAttributeAdd() {
+                this.logAttribute.form.isAddModalShow = true;
+            },
+            // 模态编辑框显示
+            modalShowLogAttributeEdit(index) {
+                var record = this.logAttribute.data[index];
+                var model = this.logAttribute.form.model;
+                model.method = record.method,
+                model.title = record.title;
+                model.template = record.template;
+                model.handler = record.handler;
+                model.async = record.async;
+                model.operator = record.operator;
+                model.tags = record.tags;
+                model.active = record.active;
+                this.logAttribute.form.isEditModalShow = true;
+            }
+
+        }
+    })
+</script>
+
+
+
+</html>
