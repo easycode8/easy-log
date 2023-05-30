@@ -55,12 +55,13 @@ public class DataSnapshotInterceptor implements Interceptor {
         // 解析原始sql
         String title = LogUtils.createDefaultTitle(method, mapperClass);
         Configuration configuration = mappedStatement.getConfiguration();
-        String realSql = MybatisUtils.showSql(configuration, boundSql);
-        LOGGER.info("[easy-log][{}] sql ==> {}", title, realSql);
+
         SqlCommandType sqlCommandType = mappedStatement.getSqlCommandType();
 
         // 获取删除或修改前的记录信息
         if (sqlCommandType == SqlCommandType.UPDATE || sqlCommandType == SqlCommandType.DELETE) {
+            String realSql = MybatisUtils.showSql(configuration, boundSql);
+            LOGGER.info("[easy-log][{}] sql ==> {}", title, realSql);
             List<Map<String, Object>> originalRecords = getOriginalRecords(sqlCommandType, realSql);
             LOGGER.info("[easy-log][{}] original data <== {}", title, JSON.toJSONString(originalRecords));
             dataSnapshotHandler.handle(mappedStatement, boundSql, originalRecords);
