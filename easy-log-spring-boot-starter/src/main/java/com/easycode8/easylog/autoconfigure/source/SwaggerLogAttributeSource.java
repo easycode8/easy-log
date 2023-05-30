@@ -30,7 +30,7 @@ public class SwaggerLogAttributeSource extends AbstractCacheLogAttributeSource {
         if (apiOperation != null && method.getAnnotation(EasyLog.class) == null) {
             LogAttribute logAttribute = DefaultLogAttribute.builder()
                     .title(apiOperation.value())
-                    .template(apiOperation.notes())
+                    //.template(apiOperation.notes()) //不适用note作为模板解析,因为可能会报错
                     .async(easyLogProperties.getAsync())
                     .build();
             return logAttribute;
