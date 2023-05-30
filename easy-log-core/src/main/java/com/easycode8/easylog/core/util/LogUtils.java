@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.easycode8.easylog.core.LogInfo;
 import com.easycode8.easylog.core.aop.interceptor.LogAttribute;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -74,7 +73,7 @@ public abstract class LogUtils {
                 }
 
             }
-            return Strings.join(paramList,',');
+            return String.join(",",paramList );
             // get 请求参数
         } else {
             StringBuilder params = new StringBuilder();
@@ -102,7 +101,7 @@ public abstract class LogUtils {
         title.append("." + method.getName());
         if (method.getParameters() != null) {
             List<String> paramNames = Arrays.stream(method.getParameters()).map(item -> item.getName()).collect(Collectors.toList());
-            title.append("(" + Strings.join(paramNames, ',') + ")");
+            title.append("(" + String.join(",",paramNames) + ")");
         } else {
             title.append("()");
         }

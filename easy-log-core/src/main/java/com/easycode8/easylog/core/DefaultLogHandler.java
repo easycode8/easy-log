@@ -1,6 +1,5 @@
 package com.easycode8.easylog.core;
 
-import com.alibaba.fastjson.JSON;
 import com.easycode8.easylog.core.aop.interceptor.LogAttribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,13 +17,13 @@ public class DefaultLogHandler implements LogDataHandler<LogInfo> {
 
     @Override
     public void before(LogInfo info, Method method, Object[] args, Class<?> targetClass, Object targetObject) {
-        LOGGER.info("[easy-log][{}]--begin content:{}", info.getTitle(), JSON.toJSONString(info));
+        LOGGER.info("[easy-log][{}]--begin operator:[{}] param:{}", info.getTitle(), info.getOperator(), info.getParams());
     }
 
     @Override
     public void after(LogInfo info, Method method, Class<?> targetClass, Object returnValue) {
         if (LogInfo.STATUS_FINISH == info.getStatus()) {
-            LOGGER.info("[easy-log][{}]--end timeout:{}", info.getTitle(), info.getTimeout());
+            LOGGER.info("[easy-log][{}]--end timeout:{} data:{}", info.getTitle(), info.getTimeout(), info.getDataSnapshot());
         } else {
             LOGGER.warn("[easy-log][{}]--end timeout:{} exception:{}", info.getTitle(), info.getTimeout(), info.getException());
         }
