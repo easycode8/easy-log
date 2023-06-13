@@ -5,7 +5,10 @@
 ![Maven Central](https://img.shields.io/maven-central/v/io.github.easycode8/easy-log-core)
 > easy-log是基于Spring AOP实现的执行日志处理工具,可以快速帮助用户实现操作日志/审计日志的功能
 
-源码地址:https://github.com/easycode8/easy-log.git
+|源码|你的star是更新的最大动力|
+|---|---|
+|github|https://github.com/easycode8/easy-log.git|
+|gitee|https://gitee.com/easycode8/easy-log.git|
 
 
 - **低入侵**:
@@ -19,6 +22,7 @@
   5. 支持使用自定义对象**扩展日志字段** 【日志对象不再写死】
   6. 支持不同日志处理器handler同时使用【不同日志不同处理】
   7. 支持方法级日志处理策略handleMode【同步/异步/全局默认)】
+  8. 提供了Web管理界面，可以在线动态控制日志功能的启停、同步异步切换和日志处理器切换等功能
   
 
 - **友好性**:

@@ -1,4 +1,23 @@
 
+## 1.0.6
+1. 支持普通mybatis(接口以Dao或Mapper结尾)的数据快照记录
+2. 优化日志属性缓存key获取,针对代理类对象。
+
+
+## 1.0.5
+1. 支持使用redis缓存动态日志配置--解决多实例配置同态同步修改
+2. 日志配置缓存支持前缀key自定义配置
+
+## 1.0.4
+1. 修改easy-log-web模块使用纯静态资源easy-log-ui.html替换springmvc转发
+2. 增加easy-log-web模块easy-log-ui.html在线访问鉴权 默认账号密码:admin/admin123
+3. 去掉swagger默认note作为spel表达式逻辑, 修复解析报错
+4. 文档补充
+
+## 1.0.3
+1. 增加easy-log-web模块支持web预览所有切面增强的日志点,支持动态启停日志/切换日志处理/同异步切换
+2. 增加easy-log-data-mybatis-plus模块自动记录数据快照(任意mapper接口修改及删除操作)
+
 ## 1.0.2
 1. 多线程中获取RequestContextHolder非空判断处理
 

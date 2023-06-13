@@ -221,7 +221,7 @@ public class TestLogController {
 > 使用不同handler处理不同日志的模式,首先是为了符合"开闭原则", 目的是为了后续能够实现动态切换处理器预留了扩展点。
 
 
-## 高级扩展篇
+## 日志扩展篇
 ### 如何使用自己的日志信息对象
 在大部分日志记录工具中,日志信息字段都是固定死的。使用者很难扩充自己字段,虽然有提供extro类似的字段,预留存放扩充值(easy-log的tags概念与此类似).能解决部分问题。但是在一些特殊场景还是没有独立的字段使用方便。
 > easy-log在设计上保留了开放字段能力.通过继承默认的LogInfo对象,使用者可以扩充需要的字段属性,并且能够通过日志处理器设置内容
@@ -340,4 +340,70 @@ public class ControllerLogAttributeMapping implements LogAttributeMappingAdapter
 
 
 ### 如何记录数据操作快照数据(数据修改对比,删除历史记录)
+easy-log支持通过基于mybatis-plus实现,无任何手动编码实现的数据快照功能，并可选模块。集成方法如下
 
+- 添加maven依赖
+
+```xml
+        <dependency>
+          <groupId>io.github.easycode8</groupId>
+          <artifactId>easy-log-spring-boot-starter</artifactId>
+          <version>latest</version>
+        </dependency>
+
+        <!--mybatis-plus记录操作的数据变化模块-->
+        <dependency>
+            <groupId>io.github.easycode8</groupId>
+            <artifactId>easy-log-data-mybatis-plus</artifactId>
+            <version>latest</version>
+        </dependency>
+```
+- 开启mybatis-plus mapper扫描
+
+```yaml
+spring:
+  easy-log:
+    scan-mybatis-plus:
+      enabled: true #是否记录mybatis-plus的mapper日志 默认:false
+```
+
+- 效果
+
+![](../img/dataSnapshot.png)
+
+
+## 集群支持
+### 集群模式动态控制日志开关
+默认情况下,集成easy-log-web模块支持的动态修改的日志配置,是保存在当前运行实例的内存中,如果服务同时部署多实例
+存在不能同时修改配置保持数据一致的问题。因此我们提供使用redis作为集群模式配置缓存的方案来解决该问题。
+
+参考示例
+
+接入项目补充redis依赖
+```xml
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+```
+配置redis连接
+```yaml
+spring:
+  ## redis config
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: 123456
+    database: 0
+```
+> 注意默认使用easy-log::作为配置前缀保存,如果多个项目通用同一个redis,并且使用相同的database,推荐调整前缀,加上应用服务的名称来区分不同项目，避免配置冲突
+
+多个项目使用一个redis,建议配置前缀为 easy-log::${spring.application.name}
+```yaml
+spring:
+  application:
+    name: xxx-service #你服务的名称
+  easy-log:
+    cache:
+      key-prefix: easy-log::${spring.application.name}
+```
