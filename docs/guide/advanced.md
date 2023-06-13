@@ -221,7 +221,7 @@ public class TestLogController {
 > 使用不同handler处理不同日志的模式,首先是为了符合"开闭原则", 目的是为了后续能够实现动态切换处理器预留了扩展点。
 
 
-## 高级扩展篇
+## 日志扩展篇
 ### 如何使用自己的日志信息对象
 在大部分日志记录工具中,日志信息字段都是固定死的。使用者很难扩充自己字段,虽然有提供extro类似的字段,预留存放扩充值(easy-log的tags概念与此类似).能解决部分问题。但是在一些特殊场景还是没有独立的字段使用方便。
 > easy-log在设计上保留了开放字段能力.通过继承默认的LogInfo对象,使用者可以扩充需要的字段属性,并且能够通过日志处理器设置内容
@@ -340,4 +340,126 @@ public class ControllerLogAttributeMapping implements LogAttributeMappingAdapter
 
 
 ### 如何记录数据操作快照数据(数据修改对比,删除历史记录)
+easy-log支持基于mybatis/mybatis-plus持久层框架,无任何手动编码自动记录修改和删除数据的快照数据,分析字段变化数据
 
+
+- 添加maven依赖
+
+```xml
+        <!--mybatis-plus记录操作的数据变化模块-->
+        <dependency>
+            <groupId>io.github.easycode8</groupId>
+            <artifactId>easy-log-data-mybatis-plus</artifactId>
+            <version>latest</version>
+        </dependency>
+```
+- 开启mybatis-plus mapper扫描
+
+```yaml
+spring:
+  easy-log:
+    scan-mybatis-plus:
+      enabled: true #是否记录mybatis-plus的mapper日志 默认:false
+```
+mybatis-plus目前支持自动记录修改接口有两种
+```java
+        // 修改方式1: mybatis-plus提供updateById方法, 根据主键Id更新对象(可以是联合主键)
+        accountMapper.updateById(account);
+        // 修改方式2: mybatis-plus提供update方法,修改数据和查询对象分离
+        accountMapper.update(account, Wrappers.<Account>lambdaQuery().eq(Account::getId, account.getId()));
+```
+mybatis目前支持自动记录快照支持按实体修改
+```java
+        //AccountMapper.xml中自定义方法updateByPrimaryKey, 入参为对象
+        accountMapper.updateByPrimaryKey(account);
+```
+- 修改效果dataSnapshot:updated 为被修改的数据
+```markdown
+2023-08-11 11:25:18.177  INFO [sample-service,ff13310320ab4b2cb2cbb6351b3b4865] 39192 --- [nio-8000-exec-3] c.e.e.core.handler.DefaultLogHandler     : [easy-log][AccountMapper.updateById(entity)]--begin operator:[null] param:{"email":"aaa@qq.com","id":10001,"name":"dddd"}
+2023-08-11 11:25:18.208  INFO [sample-service,ff13310320ab4b2cb2cbb6351b3b4865] 39192 --- [nio-8000-exec-3] c.e.e.m.i.DataSnapshotInterceptor        : [easy-log][AccountMapper.updateById(entity)] sql ==> UPDATE account SET name='dddd', email='aaa@qq.com' WHERE id=10001
+2023-08-11 11:25:18.222  INFO [sample-service,ff13310320ab4b2cb2cbb6351b3b4865] 39192 --- [nio-8000-exec-3] c.e.e.m.i.DataSnapshotInterceptor        : [easy-log][AccountMapper.updateById(entity)] original data <== [{"email":"aaa@qq.com","id":10001,"name":"李四","username":"lisi"}]
+2023-08-11 11:25:18.231  INFO [sample-service,ff13310320ab4b2cb2cbb6351b3b4865] 39192 --- [nio-8000-exec-3] c.e.e.core.handler.DefaultLogHandler     : [easy-log][AccountMapper.updateById(entity)]--end timeout:54 dataSnapshot:updated:[{"fieldName":"name","newValue":"dddd","oldValue":"李四"}]
+```
+- 删除效果dataSnapshot:deleted 为被删除数据
+```markdown
+2023-08-11 11:27:00.696  INFO [sample-service,2b2b9e544c8c42768f569368f772a16e] 39192 --- [nio-8000-exec-5] c.e.e.core.handler.DefaultLogHandler     : [easy-log][AccountServiceImpl.deleteAccount(id)]--begin operator:[null] param:10001
+2023-08-11 11:27:00.696  INFO [sample-service,2b2b9e544c8c42768f569368f772a16e] 39192 --- [nio-8000-exec-5] c.e.e.core.handler.DefaultLogHandler     : [easy-log][AccountMapper.deleteById(id)]--begin operator:[null] param:10001
+2023-08-11 11:27:00.696  INFO [sample-service,2b2b9e544c8c42768f569368f772a16e] 39192 --- [nio-8000-exec-5] c.e.e.m.i.DataSnapshotInterceptor        : [easy-log][AccountMapper.deleteById(id)] sql ==> DELETE FROM account WHERE id=10001
+2023-08-11 11:27:00.700  INFO [sample-service,2b2b9e544c8c42768f569368f772a16e] 39192 --- [nio-8000-exec-5] c.e.e.m.i.DataSnapshotInterceptor        : [easy-log][AccountMapper.deleteById(id)] original data <== [{"password":"1234","sex":"","phone":"12345678912","username":"lisi","id":10001,"createTime":1644832562000,"updateTime":1645437371000,"email":"aaa@qq.com","name":"方式4"}]
+2023-08-11 11:27:00.701  INFO [sample-service,2b2b9e544c8c42768f569368f772a16e] 39192 --- [nio-8000-exec-5] c.e.e.core.handler.DefaultLogHandler     : [easy-log][AccountMapper.deleteById(id)]--end timeout:5 dataSnapshot:deleted:[{"password":"1234","sex":"","phone":"12345678912","username":"lisi","id":10001,"createTime":1644832562000,"updateTime":1645437371000,"email":"aaa@qq.com","name":"方式4"}]
+2023-08-11 11:27:00.701  INFO [sample-service,2b2b9e544c8c42768f569368f772a16e] 39192 --- [nio-8000-exec-5] c.e.e.core.handler.DefaultLogHandler     : [easy-log][AccountServiceImpl.deleteAccount(id)]--end timeout:5 
+```
+
+- 效果
+
+![](../img/dataSnapshot.png)
+
+## 日志链路
+easy-log日志信息中预留了traceId字段用来标记日志的链路信息,以便在分布式场景下将分散在多个子系统中的日志关联起来,方便排查问题.
+
+easy-log提供基于MDC记录traceId 默认格式[xxx-service,UUID]
+```markdown
+2023-08-11 10:25:42.615  INFO [sample-service,478227a216a34dc2954d6ff714550df5] 37360 --- [nio-8000-exec-8] c.e.e.core.handler.DefaultLogHandler     : [easy-log][TestLogController.list(username)]--begin operator:[null] param:username=aaaaaaa
+2023-08-11 10:25:42.618  INFO [sample-service,478227a216a34dc2954d6ff714550df5] 37360 --- [nio-8000-exec-8] c.e.e.core.handler.DefaultLogHandler     : [easy-log][TestLogController.list(username)]--end timeout:5 
+```
+
+也可以整合开源zipkin日志追踪,并且做了自动增强处理,使用easy-log自动生成日志信息
+将可以在zipkin可视化展示。
+
+```xml
+        <!--补充zipkin 客户端-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-zipkin</artifactId>
+            <!--请自行替换与项目springboot版本适配的springcloud版本-->
+            <version>${spring-cloud.version}</version>
+        </dependency>
+```
+
+- 补充zipkin配置
+
+```yaml
+spring:
+  zipkin:
+    enabled: true
+    #zipkin server的请求地址
+    base-url: http://192.168.10.10:9411
+```
+效果:
+![](../img/advanced_zipkin.png)
+
+## 集群支持
+### 集群模式动态控制日志开关
+默认情况下,集成easy-log-web模块支持的动态修改的日志配置,是保存在当前运行实例的内存中,如果服务同时部署多实例
+存在不能同时修改配置保持数据一致的问题。因此我们提供使用redis作为集群模式配置缓存的方案来解决该问题。
+
+参考示例
+
+接入项目补充redis依赖
+```xml
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+```
+配置redis连接
+```yaml
+spring:
+  ## redis config
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: 123456
+    database: 0
+```
+> 注意默认使用easy-log::作为配置前缀保存,如果多个项目通用同一个redis,并且使用相同的database,推荐调整前缀,加上应用服务的名称来区分不同项目，避免配置冲突
+
+多个项目使用一个redis,建议配置前缀为 easy-log::${spring.application.name}
+```yaml
+spring:
+  application:
+    name: xxx-service #你服务的名称
+  easy-log:
+    cache:
+      key-prefix: easy-log::${spring.application.name}
+```

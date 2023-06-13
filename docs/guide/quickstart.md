@@ -5,10 +5,11 @@
         <dependency>
             <groupId>io.github.easycode8</groupId>
             <artifactId>easy-log-spring-boot-starter</artifactId>
+            <!-- 自行替换左上角最新版本号(数字部分) -->
             <version>latest</version>
         </dependency>
 ```
-引入依赖后默认自动装配生效,可通过配置控制
+引入依赖后默认自动装配生效,可通过配置控制开关
 ```yaml
 spring:
   easy-log:
@@ -16,10 +17,10 @@ spring:
 ```
 > easy-log基于spring aop实现功能,请确保项目已经集成并开启aop功能(spring-boot-starter-aop)
 ## 2.日志定义
-> easy-log与传统日志注解标记业务,设计上有所不同。并不局限于指定某个注解增强,而是设计成一种开放能力。
+> easy-log与传统日志注解标记业务,设计上有所不同。并不局限于指定某个日志注解增强处理,而是设计成一种开放能力。
 
 ### 方式1: 无注解记录日志
-无日志注解记录操作日志,适合只想简单记录审计日志,不想改动业务代码,包括加日志注解也不想改的”一行不改“,极致的解耦场景。
+无日志注解记录操作日志,适合简单记录审计日志,不想改动业务代码,包括加日志注解也不想改的”一行不改“,极致的解耦场景。
 
 1. 开启扫描controller日志记录配置(service同样也是支持的)
 
@@ -66,7 +67,7 @@ public class TestLogController {
 @Controller
 public class TestLogController {
 
-    @EasyLog(value = "list-查询列表信息", template = "'查询参数:' + #name ")
+    @EasyLog(value = "list-查询列表信息")
     @GetMapping("/list1")
     public ResponseEntity<Map<String, Object>> list1(String name) {
         Map<String, Object> result = new HashMap<>();
@@ -81,7 +82,7 @@ public class TestLogController {
 ![](../img/easy_log_annotation.png)
 
 ### 方式3: Swagger注解记录日志
-大部分springboot项目都会使用swagger/knife4j生产项目中对应接口文档。会在controller上描述注解@ApiOperation
+大部分springboot项目都会使用swagger/knife4j来生成项目中接口文档。一般会在controller上标记@ApiOperation注解说明接口作用,
 已经详细定义接口含义
 
 1. 开发一个简单的接口并项目引入swagger/knife4j,定义@ApiOperation接口文档
@@ -215,3 +216,35 @@ logging:
 ```
 
 ![](../img/quickstart_stopwatch.png)
+
+
+## 6. 在线管理(非必须)
+easy-log提供在线日志管理可以实现所有日志处理点的预览查询。同时还支持动态控制
+- 启停控制: 指定日志处理点关闭或者开启(方法级)
+- 同步异步切换: 指定日志处理点切换异步同步模式(方法级)
+- 日志处理器切换: 指定日志处理点切换不同的日志处理器(方法级,让不同业务有不同日志处理,或者某个日志处理失败切换处理模式)
+
+web管理模块不是必须,框架提供的可选包扩展包,引入easy-log-spring-boot-starter模块后补充web模块即可
+```xml
+        <!--日志页面管理模块(日志开关/同步异步/处理器切换)-->
+        <dependency>
+            <groupId>io.github.easycode8</groupId>
+            <artifactId>easy-log-web</artifactId>
+            <version>latest</version>
+        </dependency>
+```
+访问: http://ip:port/easy-log-ui.html 账号密码:admin/admin123 账号密码可修改也可关闭
+```yaml
+spring:
+  easy-log:
+    web:
+      enableBasicAuth: true #是否开启web访问认证, 默认true
+      username: admin #默认账号
+      password: admin123 #默认密码
+
+```
+
+预览效果
+![](../img/quickstart_web.png)
+动态修改配置
+![](../img/quickstart_web_update.png)

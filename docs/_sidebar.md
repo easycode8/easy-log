@@ -2,4 +2,5 @@
 * [指南](guide/guide)
   - [快速开始](guide/quickstart.md)
   - [进阶使用](guide/advanced.md)
+  - [框架原理](guide/design.md)
 * [更新日志](log/log.md)    
