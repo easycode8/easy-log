@@ -1,22 +1,37 @@
 package com.easycode8.easylog.core.aop.interceptor;
 
 
+import java.io.Serializable;
 import java.util.Map;
 
-public class DefaultLogAttribute implements LogAttribute{
-    /** 日志标题*/
+public class DefaultLogAttribute implements LogAttribute, Serializable {
+    /**
+     * 日志标题
+     */
     String title;
-    /** 日志处理器*/
+    /**
+     * 日志处理器
+     */
     String handler;
-    /** 日志spel模板*/
+    /**
+     * 日志spel模板
+     */
     String template;
-    /** 日志操作人*/
+    /**
+     * 日志操作人
+     */
     String operator;
-    /** 是否异步处理日志*/
+    /**
+     * 是否异步处理日志
+     */
     Boolean async;
-    /** 日志标签用于使用着扩展属性*/
+    /**
+     * 日志标签用于使用着扩展属性
+     */
     Map<String, String> tags;
-    /**是否活跃:非活跃的忽略增强处理*/
+    /**
+     * 是否活跃:非活跃的忽略增强处理
+     */
     Boolean active = true;
 
 

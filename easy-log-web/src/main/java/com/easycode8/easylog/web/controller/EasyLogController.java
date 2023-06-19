@@ -70,7 +70,9 @@ public class EasyLogController {
             logAttribute.setActive(param.getActive());
             logAttribute.setAsync(param.getAsync());
             logAttribute.setHandler(param.getHandler());
+            logAttributeSource.updateCache(param.getMethod(), logAttribute);
         }
+        result.put("message", "动态修改配置成功！");
         return ResponseEntity.ok(result);
     }
     @GetMapping("param")

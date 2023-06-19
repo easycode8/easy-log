@@ -4,6 +4,7 @@ import com.easycode8.easylog.core.adapter.LogAttributeMappingAdapter;
 import com.easycode8.easylog.core.annotation.EasyLog;
 import com.easycode8.easylog.core.annotation.EasyLogProperties;
 import com.easycode8.easylog.core.annotation.Tag;
+import com.easycode8.easylog.core.cache.LogAttributeCache;
 import com.easycode8.easylog.core.util.LogUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -16,12 +17,11 @@ import java.util.stream.Collectors;
 
 public class AnnotationLogAttributeSource extends AbstractCacheLogAttributeSource {
 
-    private final EasyLogProperties easyLogProperties;
 
     private final List<LogAttributeMappingAdapter> mappingAdapters;
 
-    public AnnotationLogAttributeSource(EasyLogProperties easyLogProperties, List<LogAttributeMappingAdapter> mappingAdapters) {
-        this.easyLogProperties = easyLogProperties;
+    public AnnotationLogAttributeSource(LogAttributeCache logAttributeCache, EasyLogProperties easyLogProperties, List<LogAttributeMappingAdapter> mappingAdapters) {
+        super(logAttributeCache, easyLogProperties);
         this.mappingAdapters = mappingAdapters;
     }
 
@@ -51,9 +51,15 @@ public class AnnotationLogAttributeSource extends AbstractCacheLogAttributeSourc
             // 如果注解指定是否同步优先级最高,否则读取项目默认配置值
             boolean async = false;
             switch (easyLog.handleMode()) {
-                case GLOBAL: async = easyLogProperties.getAsync(); break;
-                case ASYNC: async = true; break;
-                case SYNC: async = false; break;
+                case GLOBAL:
+                    async = easyLogProperties.getAsync();
+                    break;
+                case ASYNC:
+                    async = true;
+                    break;
+                case SYNC:
+                    async = false;
+                    break;
             }
 
             return DefaultLogAttribute.builder()

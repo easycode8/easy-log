@@ -2,12 +2,14 @@ package com.easycode8.easylog.core.annotation;
 
 
 import com.easycode8.easylog.core.DefaultLogHandler;
-import com.easycode8.easylog.core.adapter.LogAttributeMappingAdapter;
 import com.easycode8.easylog.core.LogDataHandler;
+import com.easycode8.easylog.core.adapter.LogAttributeMappingAdapter;
 import com.easycode8.easylog.core.aop.BeanFactoryLogAttributeSourceAdvisor;
 import com.easycode8.easylog.core.aop.interceptor.AnnotationLogAttributeSource;
 import com.easycode8.easylog.core.aop.interceptor.LogAttributeSource;
 import com.easycode8.easylog.core.aop.interceptor.LogMethodInterceptor;
+import com.easycode8.easylog.core.cache.LogAttributeCache;
+import com.easycode8.easylog.core.cache.LogAttributeCacheConfiguration;
 import com.easycode8.easylog.core.provider.OperatorProvider;
 import com.easycode8.easylog.core.provider.SessionOperatorProvider;
 import org.springframework.aop.Advisor;
@@ -17,6 +19,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.task.TaskDecorator;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -54,9 +57,18 @@ public class EasyLogConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public LogAttributeSource logAttributeSource(EasyLogProperties easyLogProperties, List<LogAttributeMappingAdapter> mappingAdapters) {
-        return new AnnotationLogAttributeSource(easyLogProperties, mappingAdapters);
+    public LogAttributeSource logAttributeSource(LogAttributeCache logAttributeCache, EasyLogProperties easyLogProperties, List<LogAttributeMappingAdapter> mappingAdapters) {
+        return new AnnotationLogAttributeSource(logAttributeCache, easyLogProperties, mappingAdapters);
     }
+
+    /**按优先级选择日志属性缓存实现 redis>local*/
+    @Configuration
+    @ConditionalOnMissingBean(LogAttributeCache.class)
+    @Import({LogAttributeCacheConfiguration.RedisCacheConfiguration.class, LogAttributeCacheConfiguration.LocalCacheConfiguration.class})
+    public static class ChooseLogAttributeCacheConfiguration {
+
+    }
+
 
 
     @Bean
