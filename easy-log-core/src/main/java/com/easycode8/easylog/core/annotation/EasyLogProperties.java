@@ -27,6 +27,8 @@ public class EasyLogProperties {
 
     private ScanController scanController;
 
+    private Cache cache = new Cache();
+
     public String getOperator() {
         return operator;
     }
@@ -81,6 +83,14 @@ public class EasyLogProperties {
 
     public void setAspectOrder(Integer aspectOrder) {
         this.aspectOrder = aspectOrder;
+    }
+
+    public Cache getCache() {
+        return cache;
+    }
+
+    public void setCache(Cache cache) {
+        this.cache = cache;
     }
 
     public static class Task {
@@ -173,6 +183,19 @@ public class EasyLogProperties {
 
         public void setEnabled(Boolean enabled) {
             this.enabled = enabled;
+        }
+    }
+
+    public static class Cache {
+        /**easy-log日志属性缓存前缀 默认: easy-log::*/
+        private String keyPrefix = "easy-log::";
+
+        public String getKeyPrefix() {
+            return keyPrefix;
+        }
+
+        public void setKeyPrefix(String keyPrefix) {
+            this.keyPrefix = keyPrefix;
         }
     }
 

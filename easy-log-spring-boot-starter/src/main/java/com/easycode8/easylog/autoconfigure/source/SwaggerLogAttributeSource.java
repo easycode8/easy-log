@@ -5,8 +5,9 @@ import com.easycode8.easylog.core.annotation.EasyLog;
 import com.easycode8.easylog.core.annotation.EasyLogProperties;
 import com.easycode8.easylog.core.aop.interceptor.AbstractCacheLogAttributeSource;
 import com.easycode8.easylog.core.aop.interceptor.DefaultLogAttribute;
-import com.easycode8.easylog.core.aop.interceptor.LogAttributeSource;
 import com.easycode8.easylog.core.aop.interceptor.LogAttribute;
+import com.easycode8.easylog.core.aop.interceptor.LogAttributeSource;
+import com.easycode8.easylog.core.cache.LogAttributeCache;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,12 +17,12 @@ import java.lang.reflect.Method;
 public class SwaggerLogAttributeSource extends AbstractCacheLogAttributeSource {
     private static final Logger LOGGER = LoggerFactory.getLogger(SwaggerLogAttributeSource.class);
     final private LogAttributeSource logAttributeSource;
-    final private EasyLogProperties easyLogProperties;
 
-    public SwaggerLogAttributeSource(LogAttributeSource logAttributeSource, EasyLogProperties easyLogProperties) {
+
+    public SwaggerLogAttributeSource(LogAttributeCache logAttributeCache, LogAttributeSource logAttributeSource, EasyLogProperties easyLogProperties) {
+        super(logAttributeCache, easyLogProperties);
         LOGGER.info("[easy-log]启动Swagger日志增强");
         this.logAttributeSource = logAttributeSource;
-        this.easyLogProperties = easyLogProperties;
     }
 
     @Override
