@@ -1,4 +1,4 @@
-package com.easycode8.easylog.mybatis;
+package com.easycode8.easylog.mybatis.handler;
 
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;

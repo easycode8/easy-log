@@ -1,11 +1,9 @@
-package com.easycode8.easylog.mybatis;
+package com.easycode8.easylog.mybatis.handler;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.easycode8.easylog.core.LogHolder;
 import com.easycode8.easylog.core.LogInfo;
-import com.easycode8.easylog.mybatis.plus.util.GenericTypeUtils;
 import com.easycode8.easylog.mybatis.util.MybatisUtils;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -24,7 +22,7 @@ public class MybatisPlusDataSnapshotHandler implements DataSnapshotHandler{
         LogInfo logInfo = LogHolder.peek();
         // 如果没开启日志上下文,忽略数据快照处理
         // TODO 操作对象暴露出去让外部决定是否要执行快照记录
-        Class entityClass = GenericTypeUtils.getGenericParameterType(mapperClass, BaseMapper.class);
+//        Class entityClass = GenericTypeUtils.getGenericParameterType(mapperClass, BaseMapper.class);
         return logInfo != null;
     }
 

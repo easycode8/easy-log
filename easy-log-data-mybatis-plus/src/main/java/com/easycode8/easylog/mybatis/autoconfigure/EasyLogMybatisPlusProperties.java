@@ -1,4 +1,4 @@
-package com.easycode8.easylog.mybatis.plus.autoconfigure;
+package com.easycode8.easylog.mybatis.autoconfigure;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

@@ -1,18 +1,16 @@
-package com.easycode8.easylog.mybatis.plus;
+package com.easycode8.easylog.mybatis.adapter;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.easycode8.easylog.core.DefaultLogHandler;
 import com.easycode8.easylog.core.LogInfo;
-import com.easycode8.easylog.core.adapter.LogAttributeMappingAdapter;
 import com.easycode8.easylog.core.aop.interceptor.DefaultLogAttribute;
 import com.easycode8.easylog.core.aop.interceptor.LogAttribute;
 import com.easycode8.easylog.core.util.LogUtils;
-import com.easycode8.easylog.mybatis.plus.util.GenericTypeUtils;
-import com.easycode8.easylog.mybatis.plus.util.MybatisPlusLogUtils;
+import com.easycode8.easylog.mybatis.util.GenericTypeUtils;
 
 import java.lang.reflect.Method;
 
-public class MybatisPlusLogDataHandler extends DefaultLogHandler implements LogAttributeMappingAdapter {
+public class MybatisPlusAdapter extends DefaultLogHandler implements MybatisLogAttributeMappingAdapter {
     @Override
     public LogAttribute getLogAttribute(Method method, Class<?> targetClass) {
 
@@ -25,7 +23,7 @@ public class MybatisPlusLogDataHandler extends DefaultLogHandler implements LogA
             String title = LogUtils.createDefaultTitle(method, ((Class)targetClass.getGenericInterfaces()[0]));
             return DefaultLogAttribute.builder()
                     .title(title)
-                    .handler(MybatisPlusLogUtils.LOG_DATA_HANDLER)
+                    .handler("mybatisPlusLogDataHandler")
                     .build();
 
         }
@@ -36,7 +34,9 @@ public class MybatisPlusLogDataHandler extends DefaultLogHandler implements LogA
     @Override
     public void before(LogInfo info, Method method, Object[] args, Class<?> targetClass, Object targetObject) {
 
-        MybatisPlusLogUtils.recordLog(info, targetObject, targetClass, method, args);
+//        MybatisPlusLogUtils.recordLog(info, targetObject, targetClass, method, args);
+        String methodName = ((Class)targetClass.getGenericInterfaces()[0]).getSimpleName() + "." + method.getName();
+        info.setMethod(methodName);
         super.before(info, method, args, targetClass, targetObject);
     }
 }

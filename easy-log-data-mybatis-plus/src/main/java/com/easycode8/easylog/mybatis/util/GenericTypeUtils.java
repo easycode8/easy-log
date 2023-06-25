@@ -1,4 +1,4 @@
-package com.easycode8.easylog.mybatis.plus.util;
+package com.easycode8.easylog.mybatis.util;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
