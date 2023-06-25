@@ -1,4 +1,10 @@
 # 说明
+## 包目录说明
+- com.easycode8.easylog.mybatis
+    - adapter: 存放适配处理逻辑 (mybatis和mybatis-plus的Mapper不一致需要适配 )
+    - handler: 处理快照数据生成逻辑
+    - interceptor: mybatis拦截器入口,是否生成日志数据快照由handler决定
+
 
 ## mybatis拦截器方式实现
 ```java

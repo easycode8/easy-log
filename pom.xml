@@ -17,7 +17,7 @@
 
     <properties>
         <!-- Project revision -->
-        <revision>1.0.5</revision>
+        <revision>1.0.6</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
@@ -40,6 +40,10 @@
         <springfox-swagger.version>2.10.5</springfox-swagger.version>
         <swagger-bootstrap-ui.version>1.9.6</swagger-bootstrap-ui.version>
         <javassist.version>3.25.0-GA</javassist.version>
+
+        <!--日志数据快照依赖-->
+        <mybatis-plus.version>3.4.2</mybatis-plus.version>
+        <druid.version>1.2.8</druid.version>
     </properties>
 
     <dependencyManagement>
