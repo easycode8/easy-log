@@ -2,9 +2,11 @@ package com.easycode8.easylog.core.aop.interceptor;
 
 
 import com.easycode8.easylog.core.annotation.EasyLogProperties;
-import com.easycode8.easylog.core.util.LogUtils;
 import com.easycode8.easylog.core.cache.LogAttributeCache;
+import com.easycode8.easylog.core.util.LogUtils;
+
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Map;
 
 public abstract class AbstractCacheLogAttributeSource implements LogAttributeSource {
@@ -20,7 +22,14 @@ public abstract class AbstractCacheLogAttributeSource implements LogAttributeSou
 
     @Override
     public LogAttribute getLogAttribute(Method method, Class<?> targetClass) {
-        String key = LogUtils.createDefaultTitle(method, targetClass, false);
+        String key;
+        // 如果是代理对象获取代理接口的真实名称
+        if (Proxy.isProxyClass(targetClass)) {
+            key = LogUtils.createDefaultTitle(method, ((Class)targetClass.getGenericInterfaces()[0]), false);
+        } else {
+            key = LogUtils.createDefaultTitle(method, targetClass, false);
+        }
+
         if (!easyLogProperties.getCache().getKeyPrefix().endsWith(":")) {
             key = easyLogProperties.getCache().getKeyPrefix() + ":" +  key;
         } else {
