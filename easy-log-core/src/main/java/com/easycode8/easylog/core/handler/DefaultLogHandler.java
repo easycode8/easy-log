@@ -1,5 +1,6 @@
-package com.easycode8.easylog.core;
+package com.easycode8.easylog.core.handler;
 
+import com.easycode8.easylog.core.LogInfo;
 import com.easycode8.easylog.core.aop.interceptor.LogAttribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

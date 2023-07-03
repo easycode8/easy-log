@@ -2,7 +2,7 @@ package com.easycode8.easylog.web.controller;
 
 
 import com.alibaba.fastjson.JSON;
-import com.easycode8.easylog.core.LogDataHandler;
+import com.easycode8.easylog.core.handler.LogDataHandler;
 import com.easycode8.easylog.core.aop.interceptor.AbstractCacheLogAttributeSource;
 import com.easycode8.easylog.core.aop.interceptor.DefaultLogAttribute;
 import com.easycode8.easylog.core.aop.interceptor.LogAttribute;

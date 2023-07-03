@@ -1,7 +1,7 @@
 package com.easycode8.easylog.mybatis.adapter;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.easycode8.easylog.core.DefaultLogHandler;
+import com.easycode8.easylog.core.handler.DefaultLogHandler;
 import com.easycode8.easylog.core.LogInfo;
 import com.easycode8.easylog.core.aop.interceptor.DefaultLogAttribute;
 import com.easycode8.easylog.core.aop.interceptor.LogAttribute;
