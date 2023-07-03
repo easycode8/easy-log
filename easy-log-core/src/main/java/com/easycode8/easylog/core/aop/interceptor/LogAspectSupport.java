@@ -1,7 +1,7 @@
 package com.easycode8.easylog.core.aop.interceptor;
 
 
-import com.easycode8.easylog.core.LogDataHandler;
+import com.easycode8.easylog.core.handler.LogDataHandler;
 import com.easycode8.easylog.core.LogHolder;
 import com.easycode8.easylog.core.LogInfo;
 import com.easycode8.easylog.core.LogStopWatch;
