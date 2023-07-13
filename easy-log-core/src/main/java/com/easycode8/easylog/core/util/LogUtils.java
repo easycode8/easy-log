@@ -67,7 +67,7 @@ public abstract class LogUtils {
             for (Object obj : args) {
                 try {
                     paramList.add(JSON.toJSONString(obj));
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     // 不是所有对象都支持序列化比如 HttpServletRequest
                     paramList.add("notSerializableParam");
                 }
