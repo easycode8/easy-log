@@ -34,8 +34,7 @@ public class MybatisPlusAdapter extends DefaultLogHandler implements MybatisLogA
     @Override
     public void before(LogInfo info, Method method, Object[] args, Class<?> targetClass, Object targetObject) {
 
-//        MybatisPlusLogUtils.recordLog(info, targetObject, targetClass, method, args);
-        String methodName = ((Class)targetClass.getGenericInterfaces()[0]).getSimpleName() + "." + method.getName();
+        String methodName = LogUtils.createDefaultTitle(method, ((Class)targetClass.getGenericInterfaces()[0]));
         info.setMethod(methodName);
         super.before(info, method, args, targetClass, targetObject);
     }
