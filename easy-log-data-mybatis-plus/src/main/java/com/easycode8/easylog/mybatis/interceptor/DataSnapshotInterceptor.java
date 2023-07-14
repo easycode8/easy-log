@@ -5,8 +5,8 @@ import com.alibaba.fastjson.JSON;
 import com.easycode8.easylog.core.util.LogUtils;
 import com.easycode8.easylog.mybatis.handler.DataSnapshotHandler;
 import com.easycode8.easylog.mybatis.util.CamelCaseUtils;
-import com.easycode8.easylog.mybatis.util.DruidSqlUtils;
 import com.easycode8.easylog.mybatis.util.MybatisUtils;
+import com.easycode8.easylog.mybatis.util.SqlUtils;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -15,10 +15,16 @@ import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.session.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
 @Intercepts({@Signature(
@@ -63,7 +69,12 @@ public class DataSnapshotInterceptor implements Interceptor {
         if (sqlCommandType == SqlCommandType.UPDATE || sqlCommandType == SqlCommandType.DELETE) {
             String realSql = MybatisUtils.showSql(configuration, boundSql);
             LOGGER.info("[easy-log][{}] sql ==> {}", title, realSql);
-            List<Map<String, Object>> originalRecords = getOriginalRecords(sqlCommandType, realSql);
+
+            Class entityClass = MybatisUtils.getEntityClassByMapper(mappedStatement, boundSql);
+
+            List originalRecords = getOriginalRecords(sqlCommandType, realSql, entityClass);
+
+
             LOGGER.info("[easy-log][{}] original data <== {}", title, JSON.toJSONString(originalRecords));
             dataSnapshotHandler.handle(mappedStatement, boundSql, originalRecords);
         }
@@ -76,31 +87,39 @@ public class DataSnapshotInterceptor implements Interceptor {
      * @param realSql
      * @return
      */
-    private List<Map<String, Object>> getOriginalRecords(SqlCommandType sqlCommandType, String realSql) {
+    private List getOriginalRecords(SqlCommandType sqlCommandType, String realSql, Class entityClass) {
         // 获取删除或修改前的记录信息
         String selectSql = "";
         if (sqlCommandType == SqlCommandType.DELETE) {
-            selectSql = DruidSqlUtils.getSelectStatementFromDelete(realSql);
+            selectSql = SqlUtils.convertDeleteToSelect(realSql);
+            List<Map<String, Object>> data = jdbcTemplate.queryForList(selectSql);
+            if (CollectionUtils.isEmpty(data)) {
+                return new ArrayList<>();
+            }
+            for (Map<String, Object> map : data) {
+                Set<String> keySet = new HashSet<String>(map.keySet());
+                keySet.forEach(key->{
+                    Object value = map.get(key);
+                    map.remove(key);
+                    LOGGER.debug(key + " => " + CamelCaseUtils.toCamelCase(key));
+                    map.put(CamelCaseUtils.toCamelCase(key), value);
+                });
+            }
+            return data;
+
         } else if (sqlCommandType == SqlCommandType.UPDATE) {
-            selectSql = DruidSqlUtils.getSelectStatementFromUpdate(realSql);
+            selectSql = SqlUtils.convertUpdateToSelect(realSql);
+            LOGGER.info("select old data:{}", selectSql);
+            // sql解析失败则放弃取历史值。
+            if (StringUtils.isEmpty(selectSql)) {
+                return new ArrayList<>();
+            }
+
+            return jdbcTemplate.query(selectSql, new CustomObjectRowMapper(entityClass));
         } else {
             return new ArrayList<>();
         }
-        LOGGER.debug("select old data:{}", selectSql);
-        List<Map<String, Object>> data = jdbcTemplate.queryForList(selectSql);
-        if (CollectionUtils.isEmpty(data)) {
-            return new ArrayList<>();
-        }
-        for (Map<String, Object> map : data) {
-            Set<String> keySet = new HashSet<String>(map.keySet());
-            keySet.forEach(key->{
-                Object value = map.get(key);
-                map.remove(key);
-                LOGGER.debug(key + " => " + CamelCaseUtils.toCamelCase(key));
-                map.put(CamelCaseUtils.toCamelCase(key), value);
-            });
-        }
-        return data;
+
     }
 
     @Override
@@ -108,5 +127,21 @@ public class DataSnapshotInterceptor implements Interceptor {
         return Plugin.wrap(target, this);
     }
 
+    static class CustomObjectRowMapper<T> extends BeanPropertyRowMapper<T> {
 
+        public CustomObjectRowMapper(Class<T> targetType) {
+            super(targetType);
+            this.setPrimitivesDefaultedForNullValue(true);
+        }
+
+        @Override
+        protected Object getColumnValue(ResultSet rs, int index, PropertyDescriptor pd) throws SQLException {
+            //System.out.println(pd.getName() + " " + pd.getPropertyType() + " " + super.getColumnValue(rs, index, pd));
+            if (!BeanUtils.isSimpleProperty(pd.getPropertyType())) {
+
+                return null;
+            }
+            return super.getColumnValue(rs, index, pd);
+        }
+    }
 }

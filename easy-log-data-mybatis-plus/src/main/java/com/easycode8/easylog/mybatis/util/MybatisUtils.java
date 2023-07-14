@@ -237,6 +237,9 @@ public abstract class MybatisUtils {
      * @param newObj 新对象
      */
     public static List<CompareResult> compareTowObject(Object oldObj, Object newObj) throws IllegalAccessException {
+        if (oldObj == null || newObj == null) {
+            return new ArrayList<>();
+        }
         return compareTowObject(oldObj, newObj, null);
     }
 

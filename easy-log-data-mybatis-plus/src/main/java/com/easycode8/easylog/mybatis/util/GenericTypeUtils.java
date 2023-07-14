@@ -33,6 +33,9 @@ public class GenericTypeUtils {
                 } else if (type instanceof Class && interfaceClass.isAssignableFrom((Class<?>) type)) {
                     return getGenericParameterType(clazz, (Class<?>) type);
                 }
+
+            } else if (type instanceof Class) { //泛型接口可能存在接口继承, 需要继续往下找才能找到泛型接口
+                return getGenericParameterType((Class<?>) type, interfaceClass);
             }
         }
         return null;

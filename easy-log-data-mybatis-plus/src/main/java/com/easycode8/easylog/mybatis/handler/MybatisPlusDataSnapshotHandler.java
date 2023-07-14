@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 public class MybatisPlusDataSnapshotHandler implements DataSnapshotHandler{
+
     @Override
     public boolean supports(Class mapperClass, Method method) {
         LogInfo logInfo = LogHolder.peek();
@@ -27,7 +28,7 @@ public class MybatisPlusDataSnapshotHandler implements DataSnapshotHandler{
     }
 
     @Override
-    public void handle(MappedStatement mappedStatement, BoundSql boundSql, List<Map<String, Object>> originalRecords) throws IllegalAccessException {
+    public void handle(MappedStatement mappedStatement, BoundSql boundSql, List<Object> originalRecords) throws IllegalAccessException {
         SqlCommandType sqlCommandType = mappedStatement.getSqlCommandType();
         LogInfo logInfo = LogHolder.peek();
         if (sqlCommandType == SqlCommandType.DELETE) {
@@ -43,9 +44,8 @@ public class MybatisPlusDataSnapshotHandler implements DataSnapshotHandler{
             Object entityObject = MybatisUtils.getEntityObjectByMapper(mappedStatement, boundSql);
 //            LOGGER.debug("mapper的实体类型:{}", entityClass);
 //            LOGGER.debug("mapper的实体对象:{}", entityObject);
-            List entityList = JSONArray.parseArray(JSON.toJSONString(originalRecords), entityClass);
             List<String> dataSnapshot = new ArrayList<>();
-            for (Object entity : entityList) {
+            for (Object entity : originalRecords) {
                 dataSnapshot.add(JSON.toJSONString(MybatisUtils.compareTowObject(entity, entityObject)));
             }
 //            LOGGER.info("[{}] data after update:{}", title, dataSnapshot);
