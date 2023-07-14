@@ -2,17 +2,16 @@ package com.easycode8.easylog.web.controller;
 
 
 import com.alibaba.fastjson.JSON;
-import com.easycode8.easylog.core.handler.LogDataHandler;
 import com.easycode8.easylog.core.aop.interceptor.AbstractCacheLogAttributeSource;
 import com.easycode8.easylog.core.aop.interceptor.DefaultLogAttribute;
 import com.easycode8.easylog.core.aop.interceptor.LogAttribute;
+import com.easycode8.easylog.core.handler.LogDataHandler;
 import com.easycode8.easylog.web.model.PageInfo;
 import com.easycode8.easylog.web.model.param.LogAttributeParam;
 import com.easycode8.easylog.web.model.vo.LogAttributeVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +23,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
-@Controller
 @RequestMapping("/easy-log")
 public class EasyLogController {
 
