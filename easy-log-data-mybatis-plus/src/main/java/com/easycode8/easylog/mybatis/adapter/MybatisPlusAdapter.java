@@ -15,8 +15,15 @@ public class MybatisPlusAdapter extends DefaultLogHandler implements MybatisLogA
     public LogAttribute getLogAttribute(Method method, Class<?> targetClass) {
 
         if (BaseMapper.class.isAssignableFrom(targetClass)) {
+            // 忽略Mapper属于Object的方法, 如toString等不记录
+            if (method.getDeclaringClass().equals(Object.class)) {
+                return null;
+            }
+
             // 如果是对象LogInfo及其子类忽略操作,避免日志持久化操作本身记录日志
-            if (LogInfo.class.isAssignableFrom(GenericTypeUtils.getGenericParameterType(((Class)targetClass.getGenericInterfaces()[0]), BaseMapper.class))) {
+            Class<?> clazz = GenericTypeUtils.getGenericParameterType(((Class)targetClass.getGenericInterfaces()[0]), BaseMapper.class);
+            // 非空判断防止用户继承泛型接口又不定义泛型
+            if ( clazz != null && LogInfo.class.isAssignableFrom(clazz)) {
                 return null;
             }
 

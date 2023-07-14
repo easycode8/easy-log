@@ -46,12 +46,6 @@
             <version>${commons-lang3.version}</version>
         </dependency>
 
-        <!--用于解析sql语句-->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid</artifactId>
-            <version>${druid.version}</version>
-        </dependency>
     </dependencies>
 
 </project>

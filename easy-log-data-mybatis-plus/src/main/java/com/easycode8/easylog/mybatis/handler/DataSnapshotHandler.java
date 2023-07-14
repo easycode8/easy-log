@@ -15,6 +15,6 @@ public interface DataSnapshotHandler {
 
     boolean supports(Class mapperClass, Method method);
 
-    void handle(MappedStatement mappedStatement, BoundSql boundSql, List<Map<String, Object>> originalRecords) throws IllegalAccessException;
+    void handle(MappedStatement mappedStatement, BoundSql boundSql, List<Object> originalRecords) throws IllegalAccessException;
 
 }
