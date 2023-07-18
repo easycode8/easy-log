@@ -6,7 +6,10 @@ import java.util.regex.Pattern;
 public class SqlUtils {
     public static String convertDeleteToSelect(String deleteSql) {
         // 定义正则表达式匹配模式，支持提取 schema 和表名
-        String pattern = "DELETE\\s+FROM\\s+(\\w+(?:\\.\\w+)?)\\s+WHERE\\s+(.+)";
+        // 支持标准的delete from语句
+        //String pattern = "DELETE\\s+FROM\\s+(\\w+(?:\\.\\w+)?)\\s+WHERE\\s+(.+)";
+        // 支持标准的delete from语句及省略form的语句
+        String pattern = "DELETE\\s+(?:FROM\\s+)?(\\w+(?:\\.\\w+)?)\\s+WHERE\\s+(.+)";
         Pattern regex = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
         Matcher matcher = regex.matcher(deleteSql);
 
