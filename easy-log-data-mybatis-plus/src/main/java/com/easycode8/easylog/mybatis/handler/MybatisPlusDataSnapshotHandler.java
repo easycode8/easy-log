@@ -42,8 +42,7 @@ public class MybatisPlusDataSnapshotHandler implements DataSnapshotHandler{
             Class entityClass = MybatisUtils.getEntityClassByMapper(mappedStatement, boundSql);
             // 获取实体对象
             Object entityObject = MybatisUtils.getEntityObjectByMapper(mappedStatement, boundSql);
-//            LOGGER.debug("mapper的实体类型:{}", entityClass);
-//            LOGGER.debug("mapper的实体对象:{}", entityObject);
+
             List<String> dataSnapshot = new ArrayList<>();
             for (Object entity : originalRecords) {
                 dataSnapshot.add(JSON.toJSONString(MybatisUtils.compareTowObject(entity, entityObject)));

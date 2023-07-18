@@ -67,16 +67,18 @@ public class DataSnapshotInterceptor implements Interceptor {
 
         // 获取删除或修改前的记录信息
         if (sqlCommandType == SqlCommandType.UPDATE || sqlCommandType == SqlCommandType.DELETE) {
-            String realSql = MybatisUtils.showSql(configuration, boundSql);
-            LOGGER.info("[easy-log][{}] sql ==> {}", title, realSql);
+            try {
+                String realSql = MybatisUtils.showSql(configuration, boundSql);
+                LOGGER.info("[easy-log][{}] sql ==> {}", title, realSql);
+                Class entityClass = MybatisUtils.getEntityClassByMapper(mappedStatement, boundSql);
+                List originalRecords = getOriginalRecords(sqlCommandType, realSql, entityClass);
+                LOGGER.info("[easy-log][{}] original data <== {}", title, JSON.toJSONString(originalRecords));
+                dataSnapshotHandler.handle(mappedStatement, boundSql, originalRecords);
+            } catch (Exception ex) {
+                // 记录数据快照不要影响业务执行
+                LOGGER.warn("[easy-log][{}] record DataSnapshot failure cause:{}", title, ex.getMessage(), ex);
+            }
 
-            Class entityClass = MybatisUtils.getEntityClassByMapper(mappedStatement, boundSql);
-
-            List originalRecords = getOriginalRecords(sqlCommandType, realSql, entityClass);
-
-
-            LOGGER.info("[easy-log][{}] original data <== {}", title, JSON.toJSONString(originalRecords));
-            dataSnapshotHandler.handle(mappedStatement, boundSql, originalRecords);
         }
         return invocation.proceed();
     }
