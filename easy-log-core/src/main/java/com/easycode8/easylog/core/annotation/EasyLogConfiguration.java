@@ -12,6 +12,8 @@ import com.easycode8.easylog.core.cache.LogAttributeCache;
 import com.easycode8.easylog.core.cache.LogAttributeCacheConfiguration;
 import com.easycode8.easylog.core.provider.OperatorProvider;
 import com.easycode8.easylog.core.provider.SessionOperatorProvider;
+import com.easycode8.easylog.core.trace.LogTracer;
+import com.easycode8.easylog.core.trace.NoneLogTracer;
 import org.springframework.aop.Advisor;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -44,14 +46,20 @@ public class EasyLogConfiguration {
 
     @Bean
     public LogMethodInterceptor easyLogMethodInterceptor(LogAttributeSource logAttributeSource,
-                                                     @Qualifier("easyLogThreadPoolTaskExecutor") ThreadPoolTaskExecutor taskExecutor,
-                                                     @Qualifier("easyLogDataHandler") LogDataHandler logDataHandler,
-                                                     ObjectProvider<OperatorProvider> operatorProvider) {
+                                                         @Qualifier("easyLogThreadPoolTaskExecutor") ThreadPoolTaskExecutor taskExecutor,
+                                                         @Qualifier("easyLogDataHandler") LogDataHandler logDataHandler,
+                                                         ObjectProvider<OperatorProvider> operatorProvider,
+                                                         ObjectProvider<LogTracer> tracerObjectProvider) {
         LogMethodInterceptor logMethodInterceptor = new LogMethodInterceptor();
         logMethodInterceptor.setLogAttributeSource(logAttributeSource);
         logMethodInterceptor.setThreadPoolTaskExecutor(taskExecutor);
         logMethodInterceptor.setLogDataHandler(logDataHandler);
         logMethodInterceptor.setOperatorProvider(operatorProvider.getIfAvailable());
+        LogTracer logTracer = tracerObjectProvider.getIfAvailable();
+        if (logTracer == null) {
+            logTracer = new NoneLogTracer();
+        }
+        logMethodInterceptor.setLogTracer(logTracer);
         return logMethodInterceptor;
     }
 

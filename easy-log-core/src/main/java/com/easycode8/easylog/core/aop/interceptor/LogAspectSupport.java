@@ -6,6 +6,7 @@ import com.easycode8.easylog.core.LogHolder;
 import com.easycode8.easylog.core.LogInfo;
 import com.easycode8.easylog.core.LogStopWatch;
 import com.easycode8.easylog.core.provider.OperatorProvider;
+import com.easycode8.easylog.core.trace.LogTracer;
 import com.easycode8.easylog.core.util.LogUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,8 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
 
     private OperatorProvider operatorProvider;
 
+    private LogTracer logTracer;
+
     @Nullable
     private BeanFactory beanFactory;
 
@@ -52,21 +55,23 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
         // 创建日志信息
         long startTime = System.currentTimeMillis();
         LogInfo info = handler.init(logAttribute, method, args, targetClass);
-
-        LogHolder.push(info);
-
-        String handlerName = handler.getClass().getSimpleName();
-        LogStopWatch stopWatch = new LogStopWatch(LOGGER, logAttribute.title());
-        stopWatch.start("{}.init() //日志初始化属性", handlerName);
-        LogUtils.initLog(info, logAttribute, method, args, targetClass);
-
-        this.chooseOperatorIfEmpty(info, operatorProvider);
-
-        info.setStatus(LogInfo.STATUS_INIT);
         boolean isAsync = logAttribute.async();
+
 
         Object returnValue = null;
         try {
+            // 日志trace初始化
+            logTracer.init(info);
+            LogHolder.push(info);
+            // 获取处理器bean
+            String handlerName = handler.getClass().getSimpleName();
+            LogStopWatch stopWatch = new LogStopWatch(LOGGER, logAttribute.title());
+            stopWatch.start("{}.init() //日志初始化属性", handlerName);
+            LogUtils.initLog(info, logAttribute, method, args, targetClass);
+            // 设置操作人
+            this.chooseOperatorIfEmpty(info, operatorProvider);
+            info.setStatus(LogInfo.STATUS_INIT);
+
             // This is an around advice: Invoke the next interceptor in the chain.
             // This will normally result in a target object being invoked.
             stopWatch.stop().start("{}.before() //日志前处理", handlerName);
@@ -74,6 +79,7 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
             info.setStatus(LogInfo.STATUS_BEFORE);
             stopWatch.stop().start("{} //{} param:{}" , info.getMethod(), info.getTitle(), info.getParams());;
 
+            logTracer.start(info);
             returnValue = invocation.proceedWithLog();
             info.setTimeout(System.currentTimeMillis() - startTime);
 
@@ -94,6 +100,9 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
         } catch (Throwable ex) {
 
             info.setTimeout(System.currentTimeMillis() - startTime);
+            if (LogInfo.STATUS_UN_INIT == info.getStatus()) {
+                LOGGER.error("[easy-log] handle init {} error:{}", LogUtils.createDefaultTitle(method, targetClass), ex.getMessage(), ex);
+            }
             if (LogInfo.STATUS_INIT == info.getStatus()) {
                 LOGGER.error("[easy-log] handle before {} error:{}", LogUtils.createDefaultTitle(method, targetClass), ex.getMessage(), ex);
             } else if (LogInfo.STATUS_BEFORE == info.getStatus()) { // 业务执行不成功记录失败原因
@@ -112,6 +121,7 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
             throw ex;
         } finally {
             LogHolder.poll();
+            logTracer.finish(info);
         }
 
         return returnValue;
@@ -208,5 +218,9 @@ public abstract class LogAspectSupport implements BeanFactoryAware , Initializin
 
     public void setOperatorProvider(OperatorProvider operatorProvider) {
         this.operatorProvider = operatorProvider;
+    }
+
+    public void setLogTracer(LogTracer logTracer) {
+        this.logTracer = logTracer;
     }
 }

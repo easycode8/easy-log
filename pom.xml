@@ -13,6 +13,7 @@
         <module>easy-log-spring-boot-starter</module>
         <module>easy-log-web</module>
         <module>easy-log-data-mybatis-plus</module>
+        <module>easy-log-trace</module>
     </modules>
 
     <properties>
