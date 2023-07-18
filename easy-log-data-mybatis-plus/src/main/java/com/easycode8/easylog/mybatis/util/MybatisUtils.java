@@ -169,16 +169,20 @@ public abstract class MybatisUtils {
 
         Object entity;
         if (parameterObject instanceof Map) {
-            // 如果参数是一个 Map，尝试从中获取实体对象
+            // 如果参数是一个 Map，尝试从中获取实体对象 兼容场景accountMapper.update(account, Wrappers.<Account>lambdaQuery().eq(Account::getId, account.getId()));
             Map<?, ?> paramMap = (Map<?, ?>) parameterObject;
             if (paramMap.containsKey("et")) {
                 entity = paramMap.get("et");
+            } else if (paramMap.containsKey("param1")) {
+                // 兼容场景:int updateByPrimaryKey2(@Param("params") Account account);
+                // 不管@Param("这里填什么"),都有额外的param1保证包装参数,因此可以使用这个获取更新对象
+                entity = paramMap.get("param1");
             } else {
                 // 如果没有 et 参数，则直接返回 null
                 return null;
             }
         } else {
-            // 如果参数不是一个 Map，则直接使用参数对象作为实体对象
+            // 如果参数不是一个 Map，则直接使用参数对象作为实体对象 兼容场景:accountMapper.updateById(account)
             entity = parameterObject;
         }
 
