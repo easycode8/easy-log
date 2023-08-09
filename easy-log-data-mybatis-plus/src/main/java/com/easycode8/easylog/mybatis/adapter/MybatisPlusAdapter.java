@@ -43,6 +43,7 @@ public class MybatisPlusAdapter extends DefaultLogHandler implements MybatisLogA
 
         String methodName = LogUtils.createDefaultTitle(method, ((Class)targetClass.getGenericInterfaces()[0]));
         info.setMethod(methodName);
+        info.setType(LogInfo.TYPE_DAO);
         super.before(info, method, args, targetClass, targetObject);
     }
 }

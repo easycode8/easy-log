@@ -32,7 +32,7 @@ public class MybatisAdapter extends DefaultLogHandler implements MybatisLogAttri
 
     @Override
     public void before(LogInfo info, Method method, Object[] args, Class<?> targetClass, Object targetObject) {
-
+        info.setType(LogInfo.TYPE_DAO);
         super.before(info, method, args, targetClass, targetObject);
     }
 }

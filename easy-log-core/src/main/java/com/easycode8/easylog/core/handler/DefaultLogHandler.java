@@ -24,8 +24,11 @@ public class DefaultLogHandler implements LogDataHandler<LogInfo> {
     @Override
     public void after(LogInfo info, Method method, Class<?> targetClass, Object returnValue) {
         if (LogInfo.STATUS_FINISH == info.getStatus()) {
-            LOGGER.info("[easy-log][{}]--end timeout:{} data:{}", info.getTitle(), info.getTimeout(), info.getDataSnapshot());
-        } else {
+            if (LogInfo.TYPE_DAO.equals(info.getType())) {
+                LOGGER.info("[easy-log][{}]--end timeout:{} dataSnapshot:{}", info.getTitle(), info.getTimeout(), info.getDataSnapshot());
+            } else {
+                LOGGER.info("[easy-log][{}]--end timeout:{} ", info.getTitle(), info.getTimeout());
+            }        } else {
             LOGGER.warn("[easy-log][{}]--end timeout:{} exception:{}", info.getTitle(), info.getTimeout(), info.getException());
         }
     }

@@ -111,7 +111,7 @@ public class DataSnapshotInterceptor implements Interceptor {
 
         } else if (sqlCommandType == SqlCommandType.UPDATE) {
             selectSql = SqlUtils.convertUpdateToSelect(realSql);
-            LOGGER.info("select old data:{}", selectSql);
+            LOGGER.debug("[easy-log] select original data:{}", selectSql);
             // sql解析失败则放弃取历史值。
             if (StringUtils.isEmpty(selectSql)) {
                 return new ArrayList<>();

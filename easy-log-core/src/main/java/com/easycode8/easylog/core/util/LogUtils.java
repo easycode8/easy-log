@@ -33,7 +33,7 @@ public abstract class LogUtils {
             info.setRequestUri( request.getRequestURI() + " [" + request.getMethod() + "]");
             info.setIp(request.getRemoteAddr());
             if (StringUtils.isEmpty(info.getType())) {
-                info.setType("web");
+                info.setType(LogInfo.TYPE_WEB);
             }
             info.setParams(LogUtils.buildRequestParams(request.getParameterMap(), args));
         } else {
@@ -41,7 +41,7 @@ public abstract class LogUtils {
         }
 
         if (targetClass.getAnnotation(Service.class) != null && StringUtils.isEmpty(info.getType())) {
-            info.setType("service");
+            info.setType(LogInfo.TYPE_SERVICE);
         }
         // 处理tags信息
         if (!CollectionUtils.isEmpty(logAttribute.tags())) {
