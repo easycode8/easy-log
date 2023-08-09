@@ -8,4 +8,8 @@ public interface LogDefinition extends Serializable {
     Integer STATUS_BEFORE = 2;
     Integer STATUS_FINISH = 3;
 
+    String TYPE_WEB = "web";
+    String TYPE_SERVICE = "service";
+    String TYPE_DAO = "dao";
+
 }
