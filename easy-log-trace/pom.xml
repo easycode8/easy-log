@@ -27,8 +27,14 @@
 
         <dependency>
             <groupId>io.github.easycode8</groupId>
-            <artifactId>easy-log-spring-boot-starter</artifactId>
+            <artifactId>easy-log-core</artifactId>
             <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <!--链路追踪 zipkin依赖，其中包含Sleuth的依赖-->

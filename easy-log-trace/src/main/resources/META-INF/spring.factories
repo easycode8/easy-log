@@ -1,2 +1,7 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.easycode8.easylog.trace.autoconfigure.EasyLogTraceAutoConfiguration
+
+
+# Environment Post Processor
+org.springframework.boot.env.EnvironmentPostProcessor=\
+  com.easycode8.easylog.trace.autoconfigure.EasyLogTraceEnvironmentPostProcessor

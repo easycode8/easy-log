@@ -6,6 +6,7 @@ import com.easycode8.easylog.core.adapter.ServiceLogAttributeMapping;
 import com.easycode8.easylog.core.annotation.EasyLogProperties;
 import com.easycode8.easylog.core.annotation.EnableEasyLog;
 import com.easycode8.easylog.core.aop.interceptor.LogAttributeSource;
+import com.easycode8.easylog.trace.autoconfigure.EasyLogTraceAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -16,7 +17,7 @@ import org.springframework.context.annotation.Import;
 
 @Configuration
 @EnableEasyLog
-@AutoConfigureAfter(RedisAutoConfiguration.class)
+@AutoConfigureAfter({EasyLogTraceAutoConfiguration.class, RedisAutoConfiguration.class})
 @ConditionalOnProperty(value = "spring.easy-log.enabled", havingValue = "true", matchIfMissing = true)
 public class EasyLogAutoConfiguration {
 
