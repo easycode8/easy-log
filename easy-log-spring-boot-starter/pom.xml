@@ -24,9 +24,17 @@
             <optional>true</optional>
         </dependency>
 
+        <!--日志记录核心包-->
         <dependency>
             <groupId>io.github.easycode8</groupId>
             <artifactId>easy-log-core</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <!--链路追踪模块-->
+        <dependency>
+            <groupId>io.github.easycode8</groupId>
+            <artifactId>easy-log-trace</artifactId>
             <version>${revision}</version>
         </dependency>
 
