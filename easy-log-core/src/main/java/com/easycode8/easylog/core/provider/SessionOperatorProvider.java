@@ -34,6 +34,10 @@ public class SessionOperatorProvider implements OperatorProvider{
 
         if (easyLogProperties.getOperator().startsWith(PREFIX_HEADER)) {
             String expression = easyLogProperties.getOperator().replace(PREFIX_HEADER, "");
+            // 项目启动后立马执行业务处理,可能是非web请求这里做下兼容
+            if (RequestContextHolder.getRequestAttributes() == null) {
+                return operator;
+            }
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
             operator =  request.getHeader(expression);
         }
