@@ -1,5 +1,6 @@
 package com.easycode8.easylog.autoconfigure;
 
+import com.easycode8.easylog.autoconfigure.source.OpenApi3LogAttributeSource;
 import com.easycode8.easylog.core.adapter.LogAttributeMappingAdapter;
 import com.easycode8.easylog.core.annotation.EasyLogProperties;
 import com.easycode8.easylog.core.aop.interceptor.LogAttributeSource;
@@ -7,6 +8,7 @@ import com.easycode8.easylog.autoconfigure.source.SwaggerLogAttributeSource;
 import com.easycode8.easylog.core.aop.interceptor.AnnotationLogAttributeSource;
 import com.easycode8.easylog.core.cache.LogAttributeCache;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -24,6 +26,18 @@ abstract class LogAttributeSourceConfiguration {
         @Bean
         public LogAttributeSource logAttributeSource(LogAttributeCache logAttributeCache, EasyLogProperties easyLogProperties, List<LogAttributeMappingAdapter> mappingAdapters) {
             return new SwaggerLogAttributeSource(logAttributeCache, new AnnotationLogAttributeSource(logAttributeCache, easyLogProperties, mappingAdapters), easyLogProperties);
+        }
+
+    }
+
+    @ConditionalOnMissingBean(LogAttributeSource.class)
+    @ConditionalOnClass(Operation.class)
+    @ConditionalOnProperty(value = "spring.easy-log.scan-open-api.enabled", havingValue = "true")
+    static class OpenApi3Source {
+
+        @Bean
+        public LogAttributeSource logAttributeSource(LogAttributeCache logAttributeCache, EasyLogProperties easyLogProperties, List<LogAttributeMappingAdapter> mappingAdapters) {
+            return new OpenApi3LogAttributeSource(logAttributeCache, new AnnotationLogAttributeSource(logAttributeCache, easyLogProperties, mappingAdapters), easyLogProperties);
         }
 
     }

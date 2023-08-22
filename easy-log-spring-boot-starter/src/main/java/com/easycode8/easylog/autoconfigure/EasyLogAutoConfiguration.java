@@ -29,7 +29,7 @@ public class EasyLogAutoConfiguration {
      * */
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnMissingBean(LogAttributeSource.class)
-    @Import({LogAttributeSourceConfiguration.SwaggerSource.class, LogAttributeSourceConfiguration.EasyLogSource.class})
+    @Import({LogAttributeSourceConfiguration.OpenApi3Source.class, LogAttributeSourceConfiguration.SwaggerSource.class, LogAttributeSourceConfiguration.EasyLogSource.class})
     protected static class ChooseLogAttributeSourceConfiguration {
 
         @Bean

@@ -21,6 +21,8 @@ public class EasyLogProperties {
 
     private Task task = new Task();
 
+    private ScanOpenApi scanOpenApi;
+
     private ScanSwagger scanSwagger;
 
     private ScanService scanService;
@@ -51,6 +53,14 @@ public class EasyLogProperties {
 
     public void setScanController(ScanController scanController) {
         this.scanController = scanController;
+    }
+
+    public ScanOpenApi getScanOpenApi() {
+        return scanOpenApi;
+    }
+
+    public void setScanOpenApi(ScanOpenApi scanOpenApi) {
+        this.scanOpenApi = scanOpenApi;
     }
 
     public ScanSwagger getScanSwagger() {
@@ -148,6 +158,19 @@ public class EasyLogProperties {
         }
     }
 
+    public static class ScanOpenApi {
+        /**是否开启openapi3 的@Operation注解作为日志标识*/
+        private Boolean enabled = false;
+
+        public Boolean getEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(Boolean enabled) {
+            this.enabled = enabled;
+        }
+    }
+
     public static class ScanSwagger {
         /**是否开启swagger的@ApiOperation注解作为日志标识*/
         private Boolean enabled = false;
@@ -160,6 +183,7 @@ public class EasyLogProperties {
             this.enabled = enabled;
         }
     }
+
     public static class ScanService {
         /**是否开启扫描@Service标记的公开方法*/
         private Boolean enabled = false;
