@@ -44,9 +44,17 @@
             <optional>true</optional>
         </dependency>
 
+        <!--swagger2注解记录日志-->
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <!--open api 3注解记录日志-->
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>2.2.8</version>
             <optional>true</optional>
         </dependency>
 

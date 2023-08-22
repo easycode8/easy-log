@@ -3,6 +3,7 @@ package com.easycode8.easylog.trace;
 import brave.Tracer;
 import com.easycode8.easylog.core.trace.LogTracer;
 import com.easycode8.easylog.trace.filter.EasyLogTraceFilter;
+import com.easycode8.easylog.trace.filter.MDCConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -21,7 +22,7 @@ public abstract class LogTraceConfiguration {
 
         @Bean
         public LogTracer logTracer() {
-            LOGGER.info("[easy-log]日志链路使用默认记录(未实现)");
+            LOGGER.info("[easy-log]日志链路启用默认记录:{}", MDCConstants.TRACE_ID);
             return new DefaultLogTracer();
         }
 
