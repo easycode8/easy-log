@@ -5,6 +5,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "spring.easy-log")
 public class EasyLogProperties {
 
+    /** 是否启用easy-log 默认true*/
+    private Boolean enabled = true;
+
     /**
      * 获取操作人信息的表达式 支持从session或请求头获取 默认为空示例:
      * <li>spring.easy-log.operator=session.account.username:通过session获取属性为account中对象的username字段作为操作人</li>
@@ -30,6 +33,15 @@ public class EasyLogProperties {
     private ScanController scanController;
 
     private Cache cache = new Cache();
+
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
 
     public String getOperator() {
         return operator;
@@ -102,6 +114,8 @@ public class EasyLogProperties {
     public void setCache(Cache cache) {
         this.cache = cache;
     }
+
+
 
     public static class Task {
 
