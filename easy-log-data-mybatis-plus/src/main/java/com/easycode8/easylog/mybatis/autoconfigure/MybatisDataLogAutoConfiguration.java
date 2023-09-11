@@ -19,7 +19,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 @ConditionalOnClass(MappedStatement.class)
 @Configuration
-@ConditionalOnProperty(name = "spring.easy-log.scan-mybatis-plus.enabled", havingValue = "true")
+@ConditionalOnProperty(name = {"spring.easy-log.enabled", "spring.easy-log.scan-mybatis-plus.enabled"}, havingValue = "true")
 @EnableConfigurationProperties(EasyLogMybatisPlusProperties.class)
 public class MybatisDataLogAutoConfiguration {
 

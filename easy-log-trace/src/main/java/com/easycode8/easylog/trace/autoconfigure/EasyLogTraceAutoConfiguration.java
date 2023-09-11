@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Import;
 @Configuration
 @AutoConfigureAfter(name = "org.springframework.cloud.sleuth.autoconfig.TraceAutoConfiguration")
 //@AutoConfigureBefore({EasyLogAutoConfiguration.class}) // 日志追踪者需要在日志核心框架执行初始化 挪到starter after等效
-@ConditionalOnProperty(value = "spring.easy-log.trace.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(value = {"spring.easy-log.enabled", "spring.easy-log.trace.enabled"}, havingValue = "true", matchIfMissing = true)
 public class EasyLogTraceAutoConfiguration {
 
 
