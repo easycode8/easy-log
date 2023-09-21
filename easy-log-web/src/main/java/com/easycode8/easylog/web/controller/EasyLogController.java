@@ -79,6 +79,7 @@ public class EasyLogController {
         Map<String, Object> dict = new HashMap<>();
         String[] beanNames = applicationContext.getBeanNamesForType(LogDataHandler.class);
         dict.put("handler", Arrays.asList(beanNames));
+        dict.put("enabledWebSocket", applicationContext.containsBean("easyLogOnlineLogFilter"));
         result.put("data", dict);
         return ResponseEntity.ok(result);
     }

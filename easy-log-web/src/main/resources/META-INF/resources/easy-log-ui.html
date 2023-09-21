@@ -4,11 +4,21 @@
     <meta charset="UTF-8"/>
     <title>easy log</title>
 
-    <script type="text/javascript" th:src="${front.vue_js}" src="webjars/easy-log/vue/vue.js"></script>
+    <script type="text/javascript" src="webjars/easy-log/vue@2.6.14/dist/vue.js"></script>
     <script type="text/javascript" th:src="${front.axios_js}" src="webjars/easy-log/axios/axios.min.js"></script>
-    <link th:href="${front.iview_css}" rel="stylesheet" href="webjars/easy-log/iview/style/iview.css"/>
-    <script type="text/javascript" th:src="${front.iview_js}" src="webjars/easy-log/iview/iview.min.js"></script>
-<!--    <script type="text/javascript" src="webjars/easy-log/easylog.js"></script>-->
+
+    <link rel="stylesheet" href="webjars/easy-log/iview@3.5.4/dist/styles/iview.css"/>
+    <script src="webjars/easy-log/iview@3.5.4/dist/iview.min.js"></script>
+
+
+    <script src="webjars/easy-log/sockjs-client/1.1.4/sockjs.min.js"></script>
+    <script src="webjars/easy-log/stomp.js/2.3.3/stomp.min.js"></script>
+
+
+    <link rel="stylesheet" href="webjars/easy-log/xterm@4.18.0/css/xterm.css">
+    <script src="webjars/easy-log/xterm@4.18.0/lib/xterm.js"></script>
+    <!--xterm 横向自适应-->
+    <script  src="webjars/easy-log/xterm-addon-fit@0.6.0/lib/xterm-addon-fit.js"></script>
 </head>
 <body>
 
@@ -56,12 +66,11 @@
         <Form-Item>
             <i-Button type="primary" @click="handleSearchSubmit">查询</i-Button>
             <i-Button type="primary" @click="handleResetFields('formSearchLogAttribute')">重置</i-Button>
-            <i-Button type="primary" @click="batchOperate">xxx批操作</i-Button>
+            <i-Button type="primary" @click="modalShowLog" :disabled="!param.enabledWebSocket">在线日志</i-Button>
         </Form-Item>
     </i-Form>
 
-<!--    <i-Button type="primary" @click="modalShowLogAttributeAdd">添加</i-Button>-->
-<!--    <i-Button type="primary" @click="batchDelete">删除</i-Button>-->
+
 
 
     <!--logAttribute 列表 -->
@@ -146,6 +155,23 @@
                 <i-switch v-model="logAttribute.form.model.active" ></i-switch>
             </Form-Item>
         </i-Form>
+    </Modal>
+
+    <!-- 实时日志模态框-->
+    <Modal
+            v-model="logAttribute.form.isLogModalShow"
+            title="实时日志"
+
+            @on-cancel = "closeWebSocket"
+            :width="1200"
+            fullscreen>
+
+        <div id="xterm"></div>
+
+<!--        <div slot="footer">
+            <i-Button type="info" @click="showFullscreen">全屏</i-Button>
+        </div>-->
+
     </Modal>
 </div>
 </body>
@@ -371,6 +397,63 @@
             this.loadLogAttributes(this.logAttribute.pageNum, this.logAttribute.pageSize);
         },
         methods: {
+
+            initializeXterm() {
+                // 初始化 xterm 终端
+                var vm = this;
+                const xterm = new Terminal({
+                    // cols: 97,
+                    rows: 40,
+                    cursorBlink: true, // 光标闪烁
+                    // cursorStyle: "block", // 光标样式  null | 'block' | 'underline' | 'bar'
+                    // scrollback: 800, //回滚
+                    // tabStopWidth: 8, //制表宽度
+                    screenKeys: true
+                });
+
+                const fitAddon = new FitAddon.FitAddon()
+                xterm.loadAddon(fitAddon)
+                xterm.open(document.getElementById("xterm"));
+                //黑窗口适应实际div宽高
+                fitAddon.fit()
+                // 添加其他 xterm 配置和事件处理程序
+                xterm.write('connected \r\n')
+                // 监听键盘输入
+                xterm.onData((data) => {
+                    // data 包含键盘输入的字符
+
+                });
+                // // 窗口尺寸变化时，终端尺寸自适应
+                window.onresize = () => {
+                    fitAddon.fit()
+                }
+                return xterm
+            },
+            closeWebSocket() {
+                var vm = this;
+                if(vm.stompClient != null){
+                    console.log("关闭websocket")
+                    // debugger
+                    vm.socket.close();
+                    vm.stompClient=null;
+                }
+            },
+            openSocket() {
+                var vm = this;
+                if(vm.stompClient==null){
+                    var socket = new SockJS(Vue.prototype.baseUrl + '/websocket-stomp');
+                    vm.socket = socket;
+                    vm.stompClient = Stomp.over(socket);
+                    vm.stompClient.connect({}, function(frame) {
+                        if (!vm.xtermInstance) {
+                            vm.xtermInstance = vm.initializeXterm();
+                        }
+                        vm.stompClient.subscribe('/topic/logback', function(event) {
+                            vm.xtermInstance.write(event.body);
+                        },{});
+                    });
+                }
+            },
             // 重置表单
             handleResetFields(name) {
                 var vm = this;
@@ -553,6 +636,11 @@
             // 模态添加框显示
             modalShowLogAttributeAdd() {
                 this.logAttribute.form.isAddModalShow = true;
+            },
+            // 模态日志框显示
+            modalShowLog() {
+                this.logAttribute.form.isLogModalShow = true;
+                this.openSocket();
             },
             // 模态编辑框显示
             modalShowLogAttributeEdit(index) {
