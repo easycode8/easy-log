@@ -5,7 +5,7 @@
     <title>easy log</title>
 
     <script type="text/javascript" src="webjars/easy-log/vue@2.6.14/dist/vue.js"></script>
-    <script type="text/javascript" th:src="${front.axios_js}" src="webjars/easy-log/axios/axios.min.js"></script>
+    <script type="text/javascript" src="webjars/easy-log/axios/axios.min.js"></script>
 
     <link rel="stylesheet" href="webjars/easy-log/iview@3.5.4/dist/styles/iview.css"/>
     <script src="webjars/easy-log/iview@3.5.4/dist/iview.min.js"></script>
@@ -161,16 +161,13 @@
     <Modal
             v-model="logAttribute.form.isLogModalShow"
             title="实时日志"
-
+            draggable
+            scrollable
+            footer-hide
             @on-cancel = "closeWebSocket"
-            :width="1200"
-            fullscreen>
+            :width="1200">
 
         <div id="xterm"></div>
-
-<!--        <div slot="footer">
-            <i-Button type="info" @click="showFullscreen">全屏</i-Button>
-        </div>-->
 
     </Modal>
 </div>
@@ -354,6 +351,7 @@
                 form:{
                     isEditModalShow:false,
                     isAddModalShow:false,
+                    isLogModalShow:false,
                     model:{
                         method: '',
                         title: '',
@@ -403,7 +401,7 @@
                 var vm = this;
                 const xterm = new Terminal({
                     // cols: 97,
-                    rows: 40,
+                    // rows: 40,
                     cursorBlink: true, // 光标闪烁
                     // cursorStyle: "block", // 光标样式  null | 'block' | 'underline' | 'bar'
                     // scrollback: 800, //回滚
@@ -509,13 +507,13 @@
                 }).then(function (response) {
                     vm.$Modal.success({
                         title: '提示',
-                        content: response.data.msg
+                        content: response.data.message
                     });
                     vm.loadLogAttributes(0, vm.logAttribute.pageSize);
                 }).catch(function (error) {
                     vm.$Modal.warning({
                         title: '提示',
-                        content: error.data.msg
+                        content: error.data.message
                     });
                 })
             },
@@ -535,13 +533,13 @@
                 }).then(function (response) {
                     vm.$Modal.success({
                         title: '提示',
-                        content: response.data.msg
+                        content: response.data.message
                     });
                     vm.loadLogAttributes(vm.logAttribute.pageNum, vm.logAttribute.pageSize);
                 }).catch(function (error) {
                     vm.$Modal.warning({
                         title: '提示',
-                        content: error.data.msg
+                        content: error.data.message
                     });
                 })
             },
@@ -572,12 +570,12 @@
                     if (response.data.success) {
                         vm.$Modal.success({
                             title: '提示',
-                            content: response.data.msg
+                            content: response.data.message
                         });
                     } else {
                         vm.$Modal.warning({
                             title: '提示',
-                            content: response.data.msg
+                            content: response.data.message
                         });
                         vm.loadLogAttributes(vm.logAttribute.pageNum, vm.logAttribute.pageSize);
                     }
@@ -598,12 +596,12 @@
                     if (response.data.success) {
                         vm.$Modal.success({
                             title: '提示',
-                            content: response.data.msg
+                            content: response.data.message
                         });
                     } else {
                         vm.$Modal.warning({
                             title: '提示',
-                            content: response.data.msg
+                            content: response.data.message
                         });
                     }
                     vm.loadLogAttributes(vm.logAttribute.pageNum, vm.logAttribute.pageSize);
@@ -621,12 +619,12 @@
                     if (response.data.success) {
                         vm.$Modal.success({
                             title: '提示',
-                            content: response.data.msg
+                            content: response.data.message
                         });
                     } else {
                         vm.$Modal.warning({
                             title: '提示',
-                            content: response.data.msg
+                            content: response.data.message
                         });
                     }
                     vm.loadLogAttributes(vm.logAttribute.pageNum, vm.logAttribute.pageSize);

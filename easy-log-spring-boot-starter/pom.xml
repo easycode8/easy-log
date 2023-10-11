@@ -44,6 +44,13 @@
             <optional>true</optional>
         </dependency>
 
+        <!--easy-log依赖spring aop开启才生效（这里引入主要用于条件装配）-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+            <optional>true</optional>
+        </dependency>
+
         <!--swagger2注解记录日志-->
         <dependency>
             <groupId>io.springfox</groupId>
