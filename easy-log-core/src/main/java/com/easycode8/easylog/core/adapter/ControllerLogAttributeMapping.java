@@ -6,13 +6,9 @@ import com.easycode8.easylog.core.aop.interceptor.LogAttribute;
 import com.easycode8.easylog.core.util.LogUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 
 /**
  * 从controller bean日志属性提取
@@ -46,9 +42,16 @@ public class ControllerLogAttributeMapping implements LogAttributeMappingAdapter
         if (!method.getDeclaringClass().equals(targetClass)) {
             return false;
         }
-        return (targetClass.getAnnotation(Controller.class) != null && (method.getAnnotation(ResponseBody.class) != null || method.getReturnType() == ResponseEntity.class))
-                ||
-                (targetClass.getAnnotation(RestController.class) != null && !Modifier.isStatic(method.getModifiers())
-                        && Modifier.isPublic(method.getModifiers()));
+//        return (targetClass.getAnnotation(Controller.class) != null && (method.getAnnotation(ResponseBody.class) != null || method.getReturnType() == ResponseEntity.class))
+//                ||
+//                (targetClass.getAnnotation(RestController.class) != null && !Modifier.isStatic(method.getModifiers())
+//                        && Modifier.isPublic(method.getModifiers()));
+
+        // 判断是否是Controller的接口方法
+        return method.isAnnotationPresent(RequestMapping.class) ||
+                method.isAnnotationPresent(GetMapping.class) ||
+                method.isAnnotationPresent(PostMapping.class) ||
+                method.isAnnotationPresent(PutMapping.class) ||
+                method.isAnnotationPresent(DeleteMapping.class);
     }
 }
