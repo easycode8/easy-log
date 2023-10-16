@@ -4,10 +4,12 @@ package com.easycode8.easylog.core.aop.interceptor;
 import com.easycode8.easylog.core.annotation.EasyLogProperties;
 import com.easycode8.easylog.core.cache.LogAttributeCache;
 import com.easycode8.easylog.core.util.LogUtils;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Map;
+import java.util.Set;
 
 public abstract class AbstractCacheLogAttributeSource implements LogAttributeSource {
 
@@ -25,13 +27,25 @@ public abstract class AbstractCacheLogAttributeSource implements LogAttributeSou
         String key;
         // 如果是代理对象获取代理接口的真实名称
         if (Proxy.isProxyClass(targetClass)) {
-            key = LogUtils.createDefaultTitle(method, ((Class)targetClass.getGenericInterfaces()[0]), false);
+            String className = ((Class) targetClass.getGenericInterfaces()[0]).getName();
+            if (!this.matches(className, easyLogProperties.getScanPackages())) {
+                return null;
+            }
+            key = LogUtils.createDefaultTitle(method, ((Class) targetClass.getGenericInterfaces()[0]), false);
+
         } else {
+            if (!this.matches(targetClass.getName(), easyLogProperties.getScanPackages())) {
+                return null;
+            }
+            if (targetClass.getAnnotation(SpringBootApplication.class) != null) {
+                return null;
+            }
+
             key = LogUtils.createDefaultTitle(method, targetClass, false);
         }
 
         if (!easyLogProperties.getCache().getKeyPrefix().endsWith(":")) {
-            key = easyLogProperties.getCache().getKeyPrefix() + ":" +  key;
+            key = easyLogProperties.getCache().getKeyPrefix() + ":" + key;
         } else {
             key = easyLogProperties.getCache().getKeyPrefix() + key;
         }
@@ -53,10 +67,18 @@ public abstract class AbstractCacheLogAttributeSource implements LogAttributeSou
 
     /**
      * 更新日志属性缓存
+     *
      * @param key
      * @param logAttribute
      */
     public void updateCache(String key, LogAttribute logAttribute) {
         this.logAttributeCache.put(key, logAttribute);
+    }
+
+    private boolean matches(String className, Set<String> basePackages) {
+        if (basePackages == null || basePackages.isEmpty()) {
+            return true;
+        }
+        return basePackages.stream().anyMatch(item -> className.startsWith(item));
     }
 }

@@ -2,6 +2,9 @@ package com.easycode8.easylog.core.annotation;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @ConfigurationProperties(prefix = "spring.easy-log")
 public class EasyLogProperties {
 
@@ -17,6 +20,9 @@ public class EasyLogProperties {
 
     /**是否开启默认异步记录日志 默认false*/
     private Boolean async = false;
+
+    /**日志aop生效的包范围,默认为空,尝试增强所有bean,建议填写项目基础包名,减少无用的aop判断,支持多个*/
+    private Set<String> scanPackages = new HashSet<>();
 
     // spring顺序默认是Ordered.LOWEST_PRECEDENCE(Integer.MAX_VALUE)优先级最低，如果两个aspect顺序一样，则使用bean注册的顺序
     /**切面的顺序 值越小越先执行Integer.MIN_VALUE 优先级最高, 设置为0 比一般spring 默认最低优先级高*/
@@ -115,7 +121,13 @@ public class EasyLogProperties {
         this.cache = cache;
     }
 
+    public Set<String> getScanPackages() {
+        return scanPackages;
+    }
 
+    public void setScanPackages(Set<String> scanPackages) {
+        this.scanPackages = scanPackages;
+    }
 
     public static class Task {
 
