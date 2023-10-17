@@ -220,11 +220,30 @@
         // 对响应数据做点什么
         return response;
     }, function (error) {
-        // 对响应错误做点什么
-        if(error.status ==403 ) {
-            window.location.href="./vue-login.html";
+        if(error.status == 401 ) {
+            if (error.data.message) {
+                logAttributeVM.$Message.error(error.data.message)
+            } else {
+                logAttributeVM.$Message.error('接口需要用户认证')
+            }
         }
-        //return Promise.reject(error);
+
+        if(error.status == 403 ) {
+            if (error.data.message) {
+                logAttributeVM.$Message.error(error.data.message)
+            } else {
+                logAttributeVM.$Message.error('接口需要用户授权')
+            }
+        }
+
+        if(error.status == 500 ) {
+            if (error.data.message) {
+                logAttributeVM.$Message.error(error.data.message)
+            } else {
+                logAttributeVM.$Message.error('接口出现异常')
+            }
+        }
+        return Promise.reject(error);
     });
     Vue.prototype.axios = instance;
 
