@@ -10,6 +10,7 @@ import com.easycode8.easylog.core.aop.interceptor.LogAttributeSource;
 import com.easycode8.easylog.core.aop.interceptor.LogMethodInterceptor;
 import com.easycode8.easylog.core.cache.LogAttributeCache;
 import com.easycode8.easylog.core.cache.LogAttributeCacheConfiguration;
+import com.easycode8.easylog.core.monitor.EasyLogApplicationInfoPrinter;
 import com.easycode8.easylog.core.provider.OperatorProvider;
 import com.easycode8.easylog.core.provider.SessionOperatorProvider;
 import com.easycode8.easylog.core.trace.LogTracer;
@@ -120,7 +121,11 @@ public class EasyLogConfiguration {
         return taskExecutor;
     }
 
-
+    // 打印应用监控信息
+    @Bean
+    public EasyLogApplicationInfoPrinter easyLogApplicationInfoPrinter() {
+        return new EasyLogApplicationInfoPrinter();
+    }
 
 
 }
