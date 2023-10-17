@@ -2,6 +2,7 @@ package com.easycode8.easylog.core.aop;
 
 import com.easycode8.easylog.core.aop.interceptor.LogAttributeSource;
 import com.easycode8.easylog.core.aop.interceptor.LogAttributeSourcePointcut;
+import com.easycode8.easylog.core.aop.interceptor.TimingLogAttributeSourcePointcut;
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.support.AbstractBeanFactoryPointcutAdvisor;
 import org.springframework.lang.Nullable;
@@ -10,7 +11,7 @@ public class BeanFactoryLogAttributeSourceAdvisor extends AbstractBeanFactoryPoi
     @Nullable
     private LogAttributeSource logAttributeSource;
 
-    private final LogAttributeSourcePointcut logAttributeSourcePointcut = new LogAttributeSourcePointcut() {
+    private final LogAttributeSourcePointcut logAttributeSourcePointcut = new TimingLogAttributeSourcePointcut() {
         @Override
         protected LogAttributeSource getLogAttributeSource() {
             return logAttributeSource;

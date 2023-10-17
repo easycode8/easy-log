@@ -237,8 +237,10 @@ public class EasyLogProperties {
     }
 
     public static class Cache {
-        /**easy-log日志属性缓存前缀 默认: easy-log::*/
-        private String keyPrefix = "easy-log::";
+        /**easy-log日志属性缓存前缀 默认: easy-log: */
+        private String keyPrefix = "easy-log:xxx-service";
+        /** 是否强制删除历史缓存 */
+        private Boolean dropFirst = false;
 
         public String getKeyPrefix() {
             return keyPrefix;
@@ -246,6 +248,15 @@ public class EasyLogProperties {
 
         public void setKeyPrefix(String keyPrefix) {
             this.keyPrefix = keyPrefix;
+        }
+
+
+        public Boolean getDropFirst() {
+            return dropFirst;
+        }
+
+        public void setDropFirst(Boolean dropFirst) {
+            this.dropFirst = dropFirst;
         }
     }
 
