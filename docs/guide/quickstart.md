@@ -16,11 +16,15 @@ spring:
     enabled: true #是否启动easy-log-spring-boot-starter 默认:true
 ```
 > easy-log基于spring aop实现功能,请确保项目已经集成并开启aop功能(spring-boot-starter-aop)
+
+不修改任何代码及配置,项目提供基本启动日志信息
+![](../img/quickstart_starter.png)
+
 ## 2.日志定义
 > easy-log与传统日志注解标记业务,设计上有所不同。并不局限于指定某个日志注解增强处理,而是设计成一种开放能力。
 
 ### 方式1: 无注解记录日志
-无日志注解记录操作日志,适合简单记录审计日志,不想改动业务代码,包括加日志注解也不想改的”一行不改“,极致的解耦场景。
+无日志注解记录操作日志,适合简单记录请求日志,不想改动业务代码,包括加日志注解也不想改的”一行不改“,极致的解耦场景。
 
 1. 开启扫描controller日志记录配置(service同样也是支持的)
 
@@ -51,6 +55,9 @@ public class TestLogController {
 3. 无日志注解记录日志效果
 
 ![](../img/log_not_annotation.png)
+
+- 自动记录请求类及方法,并记录参数及超时时间
+- 自动为请求生成traceId
 
 ### 方式2: @EasyLog记录日志
 @EasyLog为框架提供默认日志注用于标记需要记录日志的controller/service等接口,并且实现了定义日志处理,异步处理,自定义标签属性等高级功能
@@ -163,7 +170,7 @@ public class TestLogController {
 ```
 
 ## 4.处理日志信息
-默认的日志处理器,只是简单实现了。执行前后的日志信息打印.
+默认的日志处理器,只是简单实现了, 接口执行前后的日志信息打印.
 ```java
 public class DefaultLogHandler implements LogDataHandler<LogInfo> {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultLogHandler.class);
@@ -205,7 +212,7 @@ public class H2DataHandler extends DefaultLogHandler {
 
 ## 5. 日志性能
 任何使用aop增加逻辑,如论是事务控制,权限注解,缓存注解还是日志记录,都会对相比无aop方法执行产生一定得性能影响,使用可能会关心使用.日志记录产生影响到底是多少,是否有量化指标。
-easy集成spring stopwatch功能来记录业务方法操作及日志处理器各个环节的执行耗时分析
+easy-log集成spring stopwatch功能来记录业务方法操作及日志处理器各个环节的执行耗时分析
 
 开启方法很简单
 ```yaml
@@ -248,3 +255,26 @@ spring:
 ![](../img/quickstart_web.png)
 动态修改配置
 ![](../img/quickstart_web_update.png)
+
+
+> 在线实时日志支持依赖websocket和logback日志(springboot默认)
+
+补充websocket依赖
+```xml
+        <!--websocket-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+```
+在线日志效果
+![](../img/quickstart_web_websocket.png)
+
+如果不需要在线日志可以控制关闭
+```yaml
+spring:
+  easy-log:
+    web:
+      websocket:
+        enabled: true #是否开启websocket在线日志功能, 默认true
+```
