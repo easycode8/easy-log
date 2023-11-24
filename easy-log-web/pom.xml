@@ -12,11 +12,6 @@
 
     <artifactId>easy-log-web</artifactId>
 
-    <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-    </properties>
-
     <dependencies>
         <!--生成spring-configuration-metadata.json 属性提示-->
         <dependency>

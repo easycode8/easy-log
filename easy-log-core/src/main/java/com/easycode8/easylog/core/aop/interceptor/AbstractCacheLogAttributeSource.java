@@ -4,6 +4,8 @@ package com.easycode8.easylog.core.aop.interceptor;
 import com.easycode8.easylog.core.annotation.EasyLogProperties;
 import com.easycode8.easylog.core.cache.LogAttributeCache;
 import com.easycode8.easylog.core.util.LogUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.lang.reflect.Method;
@@ -12,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 public abstract class AbstractCacheLogAttributeSource implements LogAttributeSource {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractCacheLogAttributeSource.class);
     private final LogAttributeCache logAttributeCache;
     protected EasyLogProperties easyLogProperties;
 
@@ -79,6 +81,10 @@ public abstract class AbstractCacheLogAttributeSource implements LogAttributeSou
         if (basePackages == null || basePackages.isEmpty()) {
             return true;
         }
-        return basePackages.stream().anyMatch(item -> className.startsWith(item));
+        boolean matches = basePackages.stream().anyMatch(item -> className.startsWith(item));
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("[ease-log] 类:{} AOP增强:{} 匹配前缀:{}", className, matches, basePackages);
+        }
+        return matches;
     }
 }

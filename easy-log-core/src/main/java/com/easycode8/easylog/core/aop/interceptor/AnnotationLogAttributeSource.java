@@ -10,6 +10,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
+import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,8 @@ public class AnnotationLogAttributeSource extends AbstractCacheLogAttributeSourc
                 tagMap = Arrays.stream(tags)
                         // 提出key为空的数据
                         .filter(item -> StringUtils.hasText(item.key()))
-                        .map(p -> Map.entry(p.key(), p.value()))
+//                        .map(p -> Map.entry(p.key(), p.value()))
+                        .map(p -> new AbstractMap.SimpleEntry<>(p.key(), p.value()))
                         // 将 Map.Entry 对象转为 Map
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
