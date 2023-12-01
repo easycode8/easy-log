@@ -1,3 +1,3 @@
 # 项目说明
 
-[Link Text](docs/docs/guide/advanced.md)
+[Link Text](docs/guide/advanced.md)
